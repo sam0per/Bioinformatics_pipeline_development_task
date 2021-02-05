@@ -1,0 +1,2 @@
+Sample	bam_file	total_reads	mapped_reads	mapped_bases	sequenced_bases	mean_insert_size	median_insert_size	mean_mapping_quality	general_error_rate	mean_coverage	percentage_aligned
+chr19	../Files_needed_for_task/chr19.bam	1832431.0	1825430.0	270661746.0	270550819.0	10229.5847	307.0	0.3236	0.0043	0.0873	99.61793922936253
