@@ -17,16 +17,24 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
 
 2. Create an environment called "pipeline_development" with the required software listed inside the YAML file and activate it
 ```
+    cd Bioinformatics_pipeline_development_task
     conda env create --name pipeline_development --file environment.yaml
     conda activate pipeline_development
 ```
 
-3. Execute the workflow locally
+3. Download human assembly hg19 and chromosome 19 fasta file
 ```
-    snakemake
+    rsync -avzP rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit .
+    wget http://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/chr19.fa.gz
+    gunzip chr19.fa.gz
 ```
 
-4. Output a self-contained interactive HTML report with all results
+4. Execute the workflow locally using 1 core (change the number of cores as you wish)
+```
+    snakemake --cores 1
+```
+
+5. Output a self-contained interactive HTML report with all results
 ```
     snakemake --report report.html
 ```
