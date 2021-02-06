@@ -7,10 +7,23 @@ head(dep)
 tail(dep)
 colnames(dep) <- c("CHROM", "POS", "DEPTH")
 range(dep$POS)
+
 table(dep$DEPTH>0)
+3497613/length(min(dep$POS):max(dep$POS))
+
 head(dep[dep$DEPTH==0,])
 sum(dep$DEPTH)
-dep[dep$DEPTH==1034,]
+dep[dep$DEPTH==max(dep$DEPTH),]
+
+deeptT <- read.table("Bioinformatics_pipeline_development_task/results/1_read_coverage/chr19_coverage.txt")
+head(deeptT)
+range(deeptT$V2)
+range(deeptT$V3)
+table(deeptT$V4>0)
+247677/length(min(dep$POS):max(dep$POS))
+mean(deeptT$V4)
+deeptT[deeptT$V4==max(deeptT$V4),]
+deeptT[6900:6950,]
 
 # PLOT DEPTH ACROSS ENTIRE CHROMOSOME 19
 range(dep$DEPTH)
@@ -33,6 +46,16 @@ axis(1,
                   by = l/4
      )
 )
+
+mean(dep$DEPTH)
+bedgr <- read.table("Bioinformatics_pipeline_development_task/results/1_read_coverage/chr19_coverage.bedgraph")
+head(bedgr)
+mean(bedgr$V4)
+
+deps <- dep[sample(x = 1:nrow(dep), size = 1000, replace = FALSE), ]
+head(deps)
+ggplot(data = deps) +
+   geom_segment(aes(x = POS, y = 0, xend = POS, yend = DEPTH))
 
 # READ TARGET FILE
 tar <- read.table(file = "Files_needed_for_task/target_regions.bed")

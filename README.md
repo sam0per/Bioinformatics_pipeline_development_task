@@ -22,11 +22,14 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     conda activate pipeline_development
 ```
 
-3. Download human assembly hg19 and chromosome 19 fasta file
+3. Download human assembly hg19, chromosome 19 FASTA file and chromosome 19 dbSNP BED file
 ```
+    mkdir data
+    cd data
     rsync -avzP rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit .
     wget http://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/chr19.fa.gz
     gunzip chr19.fa.gz
+    wget ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/bed_chr_19.bed.gz
 ```
 
 4. Execute the workflow locally using 1 core (change the number of cores as you wish)
