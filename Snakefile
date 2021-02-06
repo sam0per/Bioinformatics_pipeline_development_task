@@ -1,5 +1,20 @@
-rule chr19_interval:
+rule mark_duplicates:
     input: "../Files_needed_for_task/chr19.bam"
+    output:
+        bam="../Files_needed_for_task/chr19_dedup.bam",
+        metrics="results/qc/chr19_dedup.metrics.txt",
+        sortbam="../Files_needed_for_task/chr19_dedup_sort.bam"
+    log: "logs/picard/chr19_dedup.log"
+    shell:
+        """
+        picard MarkDuplicates I={input} O={output.bam} M={output.metrics} \
+        REMOVE_DUPLICATES=true ASSUME_SORT_ORDER=coordinate VALIDATION_STRINGENCY=LENIENT \
+        USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        picard SortSam INPUT={output.bam} OUTPUT={output.sortbam} SORT_ORDER=coordinate
+        """
+
+rule chr19_interval:
+    input: "../Files_needed_for_task/chr19_dedup_sort.bam"
     output: "results/1_read_coverage/chr19_interval.txt"
     shell: 
         """
@@ -8,7 +23,7 @@ rule chr19_interval:
         """
 
 rule chr19_depth:
-    input: "../Files_needed_for_task/chr19.bam"
+    input: "../Files_needed_for_task/chr19_dedup_sort.bam"
     output: "results/1_read_coverage/chr19_depth.txt"
     shell: "samtools depth {input} > {output}"
 
@@ -54,4 +69,17 @@ rule chr19_gc:
         computeGCBias -b {input} --effectiveGenomeSize 2864785220 \
         -g data/hg19.2bit --GCbiasFrequenciesFile {output.dat} \
         -r chr19:60004:14992498 --biasPlot {output.fig}
+        """
+
+rule base_recal:
+    input: "../Files_needed_for_task/chr19_dedup_sort.bam"
+    output:
+        tbl="../Files_needed_for_task/recal_data.table",
+        bam="../Files_needed_for_task/chr19_recal.bam"
+    shell:
+        """
+        gatk BaseRecalibrator -I {input} -R data/hg19.fa --known-sites ../Files_needed_for_task/ground_truth.vcf \
+        -O {output.tbl}
+        gatk ApplyBQSR -R data/hg19.fa -I {input} --bqsr-recal-file {output.tbl} -O {output.bam}
+        gatk AnalyzeCovariates -bqsr {output.tbl} -plots figures/AnalyzeCovariates.pdf
         """
