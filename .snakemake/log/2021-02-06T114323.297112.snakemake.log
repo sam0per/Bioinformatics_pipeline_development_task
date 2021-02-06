@@ -1,0 +1,24 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	chr19_interval
+	1
+Select jobs to execute...
+
+[Sat Feb  6 11:43:23 2021]
+rule chr19_interval:
+    input: ../Files_needed_for_task/chr19.bam
+    output: ../Read_coverage/chr19_interval.txt
+    jobid: 0
+
+
+        samtools view ../Files_needed_for_task/chr19.bam | awk "{print \$3 "\t" \$4 "\t" \$4+length(\$10)-1}" > ../Read_coverage/chr19_interval.txt
+        sort -nk2 ../Read_coverage/chr19_interval.txt | awk 'NR==1{print "min:" $2} END{print "max:" $3}'
+        
+[Sat Feb  6 11:44:01 2021]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /Users/samuelperini/Documents/sophia_gen/Bioinformatics (pipeline development) task/Bioinformatics_pipeline_development_task/.snakemake/log/2021-02-06T114323.297112.snakemake.log

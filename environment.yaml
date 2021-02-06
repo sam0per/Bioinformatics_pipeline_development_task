@@ -16,4 +16,7 @@ dependencies:
   - gatk
   - multiqc
   - bedtools
+  - bedops
+  - deeptools
+  - emboss
 

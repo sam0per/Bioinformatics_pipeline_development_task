@@ -1,0 +1,19 @@
+Building DAG of jobs...
+Job counts:
+	count	jobs
+	1	chr19_interval
+	1
+
+[Sat Feb  6 11:19:30 2021]
+rule chr19_interval:
+    input: ../Files_needed_for_task/chr19.bam
+    output: ../Read_coverage/chr19_interval.tsv
+    jobid: 0
+
+RuleException in line 1 of /Users/samuelperini/Documents/sophia_gen/Bioinformatics (pipeline development) task/Bioinformatics_pipeline_development_task/Snakefile:
+NameError: The name 'print $3 "\t" $4 "\t" $4+length($10)-1' is unknown in this context. Please make sure that you defined that variable. Also note that braces not used for variable access have to be escaped by repeating them, i.e. {{print $1}}
+  File "/Users/samuelperini/miniconda/envs/pipeline_development/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 136, in run_jobs
+  File "/Users/samuelperini/miniconda/envs/pipeline_development/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 145, in run
+  File "/Users/samuelperini/miniconda/envs/pipeline_development/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 156, in _run
+  File "/Users/samuelperini/miniconda/envs/pipeline_development/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 176, in printjob
+  File "/Users/samuelperini/miniconda/envs/pipeline_development/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 162, in printjob

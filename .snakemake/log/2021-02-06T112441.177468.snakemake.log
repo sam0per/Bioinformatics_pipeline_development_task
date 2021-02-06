@@ -1,0 +1,34 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	chr19_interval
+	1
+Select jobs to execute...
+
+[Sat Feb  6 11:24:41 2021]
+rule chr19_interval:
+    input: ../Files_needed_for_task/chr19.bam
+    output: ../Read_coverage/chr19_interval.tsv
+    jobid: 0
+
+
+        samtools view ../Files_needed_for_task/chr19.bam | awk "{print $3 "\t" \$4 "\t" \$4+length(\$10)-1}" > ../Read_coverage/chr19_interval.tsv
+        sort -nk2 ../Read_coverage/chr19_interval.tsv | awk "NR==1{print "min:"\$2} END{print "max:"\$3}"
+        
+[Sat Feb  6 11:24:41 2021]
+Error in rule chr19_interval:
+    jobid: 0
+    output: ../Read_coverage/chr19_interval.tsv
+    shell:
+        
+        samtools view ../Files_needed_for_task/chr19.bam | awk "{print $3 "\t" \$4 "\t" \$4+length(\$10)-1}" > ../Read_coverage/chr19_interval.tsv
+        sort -nk2 ../Read_coverage/chr19_interval.tsv | awk "NR==1{print "min:"\$2} END{print "max:"\$3}"
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /Users/samuelperini/Documents/sophia_gen/Bioinformatics (pipeline development) task/Bioinformatics_pipeline_development_task/.snakemake/log/2021-02-06T112441.177468.snakemake.log
