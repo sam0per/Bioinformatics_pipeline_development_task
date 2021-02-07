@@ -1,3 +1,10 @@
+rule all:
+    input:
+        "figures/1_read_coverage/chr19_coverage",
+        "figures/1_read_coverage/chr19_coverage_target",
+        "figures/1_read_coverage/chr19_gc.png"
+
+
 rule mark_duplicates:
     input: "../Files_needed_for_task/chr19.bam"
     output:
@@ -25,24 +32,33 @@ rule chr19_interval:
 rule chr19_depth:
     input: "../Files_needed_for_task/chr19_dedup_sort.bam"
     output: "results/1_read_coverage/chr19_depth.txt"
-    shell: "samtools depth {input} > {output}"
+    shell:
+        """
+        samtools index {input}
+        samtools depth -a -q 10 -Q 10 -r 19:60004-14992498 {input} > {output}
+        """
 
 rule chr19_coverage:
     input: "results/1_read_coverage/chr19_depth.txt"
     output: "results/1_read_coverage/chr19_cov_redundancy.txt"
-    shell: "cut -f 3 {input} | sort | uniq -c > {output}"
+    shell:
+        """
+        cut -f 3 {input} | sort | uniq -c > {output}
+        awk '{{ sum += $3 }} END {{ if (NR > 0) print "Mean coverage: " sum / NR "X" }}' {input}
+        """
 
 rule plot_coverage:
-    input: "../Files_needed_for_task/chr19_rehead.bam"
+    input: "../Files_needed_for_task/chr19_dedup_sort.bam"
     output:
+        bam="../Files_needed_for_task/chr19_rehead.bam",
         fig="figures/1_read_coverage/chr19_coverage",
         dat="results/1_read_coverage/chr19_coverage.txt"
     shell:
         """
-        bash scripts/samtools_rehead.sh
-        samtools index {input}
-        plotCoverage -b {input} --plotFile {output.fig} --ignoreDuplicates --minMappingQuality 10 -r chr19:60004:14992498 \
-        --outRawCounts {output.dat}
+        bash scripts/samtools_rehead.sh {input} {output.bam}
+        samtools index {output.bam}
+        plotCoverage -b {output.bam} --plotFile {output.fig} --ignoreDuplicates \
+        --minMappingQuality 10 -r chr19:60004:14992498 --outRawCounts {output.dat}
         """
 
 rule plot_coverage_target:
@@ -55,8 +71,7 @@ rule plot_coverage_target:
     shell:
         """
         plotCoverage -b {input.bam} --plotFile {output.fig} --BED {input.bed} --ignoreDuplicates \
-        --minMappingQuality 10 -r chr19:60004:14992498 \
-        --outRawCounts {output.dat}
+        --minMappingQuality 10 -r chr19:60004:14992498 --outRawCounts {output.dat}
         """
 
 rule chr19_gc:

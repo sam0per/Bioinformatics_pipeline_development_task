@@ -2,7 +2,14 @@
 
 #$ -cwd
 
-samtools view -H ../Files_needed_for_task/chr19.bam |\
+# The script changes the chromosome header of the first argument which must be a BAM or SAM file
+# and save the new file as the second argument
+# Example: bash scripts/samtools_rehead.sh ../Files_needed_for_task/chr19_dedup_sort.bam ../Files_needed_for_task/chr19_rehead.bam
+
+IBAM=$1
+OBAM=$2
+
+samtools view -H $IBAM |\
 sed -e 's/SN:1/SN:chr1/' | sed -e 's/SN:2/SN:chr2/' | \
 sed -e 's/SN:3/SN:chr3/' | sed -e 's/SN:4/SN:chr4/' | \
 sed -e 's/SN:5/SN:chr5/' | sed -e 's/SN:6/SN:chr6/' | \
@@ -15,4 +22,4 @@ sed -e 's/SN:17/SN:chr17/' | sed -e 's/SN:18/SN:chr18/' | \
 sed -e 's/SN:19/SN:chr19/' | sed -e 's/SN:20/SN:chr20/' | \
 sed -e 's/SN:21/SN:chr21/' | sed -e 's/SN:22/SN:chr22/' | \
 sed -e 's/SN:X/SN:chrX/' | sed -e 's/SN:Y/SN:chrY/' | \
-sed -e 's/SN:MT/SN:chrM/' | samtools reheader - ../Files_needed_for_task/chr19.bam > ../Files_needed_for_task/chr19_rehead.bam
+sed -e 's/SN:MT/SN:chrM/' | samtools reheader - $IBAM > $OBAM

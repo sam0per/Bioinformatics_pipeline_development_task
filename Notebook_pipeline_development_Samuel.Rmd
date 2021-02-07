@@ -2,6 +2,8 @@
 title: "Analysis Assignment – Pipeline Development"
 author: "Samuel Perini"
 date: "2/5/2021"
+header-includes:
+  - \usepackage{nicefrac}
 output: html_notebook
 ---
 
@@ -21,17 +23,21 @@ samtools view ../Files_needed_for_task/chr19_dedup_sort.bam | awk '{print $3 "\t
 sort -nk2 results/1_read_coverage/chr19_interval.txt | awk 'NR==1{print "min:"$2} END{print "max:"$3}'
 ```
 
-The percetage of the chr19 interval that was covered can be calculated as:
+The percetage of the chr19 interval that was covered by at least one read can be calculated as:
 
 $\left ( \frac{\text{No. of bases covered}}{\text{chr19 interval}} \right) \times 100$
 
-After calculating the number of bases with zero read coverage (564; see code below), it is possible to obtain the number of bases covered $(3,498,177 - 564 = 3,497,613)$ and then the percentage of covarage $(3,497,613 / 3,498,177) \times 100 = 99.98\%$. Thus, the selected interval of chr19 was very well covered by at least one read but what is more important for assessing the quality of the read coverage is to measure the proportion of chr19 that was covered by more reads (e.g., 2,3,4, etc.).
+After calculating the number of bases with zero read coverage (11,464,884 bases; see code below), it is possible to obtain the number of bases covered by at least one read $(14,932,495 - 11,464,884 = 3,467,611)$ and so the percentage of 1X covarage $(3,467,611/14,932,495) \times 100 = 23\%$. Thus, the selected interval of chr19 was overall poorly covered and on average, there were 14 reads per base pair meaning an average 14X coverage (Fig. 1). For single sample sequencing, which is the case of this assignment, an average 30X coverage has been a standard minimum for generating a reliable variant call and more recently this mininum has been raised to 50X or 100X coverage, especially in studies on cancer __(REF)__. Given that, in this assignemnt, the overall fraction of the chr19 region was scarcely covered and that the average coverage was much lower than the current standards, the variant calling output for the given sample should be treated with caution. I expect the variant calling output to contain variants that are not present in the ground truth (false positives) as well as to lack variants that are instead present in the groun truth. Hence, I expect this pipeline to be less sensitive, less precise and less specific at calling variants than the pipeline used for generating the ground truth.
+
 
 ```{bash depth}
-samtools depth ../Files_needed_for_task/chr19.bam > results/1_read_coverage/chr19_depth.txt
+samtools depth ../Files_needed_for_task/chr19_dedup_sort.bam > results/1_read_coverage/chr19_depth.txt
 
 # The first line of the file chr19_cov_redundancy.txt is the number of bases with zero read coverage
 cut -f 3 results/1_read_coverage/chr19_depth.txt | sort | uniq -c > results/1_read_coverage/chr19_cov_redundancy.txt
+
+# Mean coverage
+awk '{ sum += $3 } END { if (NR > 0) print sum / NR }' results/1_read_coverage/chr19_depth.txt
 ```
 
 The count of the number of overlapping reads tells us how many bases are covered how many times.
