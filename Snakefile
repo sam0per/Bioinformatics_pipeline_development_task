@@ -47,7 +47,7 @@ rule chr19_coverage:
         awk '{{ sum += $3 }} END {{ if (NR > 0) print "Mean coverage: " sum / NR "X" }}' {input}
         """
 
-rule plot_coverage:
+rule DeepT_coverage:
     input: "../Files_needed_for_task/chr19_dedup_sort.bam"
     output:
         bam="../Files_needed_for_task/chr19_rehead.bam",
@@ -61,7 +61,7 @@ rule plot_coverage:
         --minMappingQuality 10 -r chr19:60004:14992498 --outRawCounts {output.dat}
         """
 
-rule plot_coverage_target:
+rule DeepT_coverage_target:
     input:
         bam="../Files_needed_for_task/chr19_rehead.bam",
         bed="../Files_needed_for_task/target_regions.bed"
@@ -72,6 +72,18 @@ rule plot_coverage_target:
         """
         plotCoverage -b {input.bam} --plotFile {output.fig} --BED {input.bed} --ignoreDuplicates \
         --minMappingQuality 10 -r chr19:60004:14992498 --outRawCounts {output.dat}
+        """
+
+rule plot_coverage:
+    input:
+        red="results/1_read_coverage/chr19_cov_redundancy.txt",
+        cov="results/1_read_coverage/chr19_coverage.txt"
+    output: "figures/1_read_coverage/chr19_r_coverage.png"
+    shell:
+        """
+        conda activate r_env
+        Rscript scripts/chr19_1_plot_coverage.R -r {input.red} -b {input.cov} -o {output}
+        conda deactivate
         """
 
 rule chr19_gc:

@@ -15,14 +15,19 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
 
 1. [Install Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
-2. Create an environment called "pipeline_development" with the required software listed inside the YAML file and activate it
+1. Create an environment called "pipeline_development" with the required software listed inside the YAML file and activate it
 ```
     cd Bioinformatics_pipeline_development_task
     conda env create --name pipeline_development --file environment.yaml
     conda activate pipeline_development
 ```
 
-3. Download human assembly hg19, chromosome 19 FASTA file and chromosome 19 dbSNP BED file
+1. Create a second environment called "r_env" with the required software listed inside a different YAML file. This environment will be activated inside the pipeline to avoid conflicting packages.
+```
+    conda env create --name r_env --file r-environment.yaml
+```
+
+1. Download human assembly hg19, chromosome 19 FASTA file and chromosome 19 dbSNP BED file
 ```
     mkdir data
     cd data
@@ -35,12 +40,12 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     cd ../
 ```
 
-4. Execute the workflow locally using 1 core (change the number of cores as you wish)
+1. Execute the workflow locally using 1 core (change the number of cores as you wish)
 ```
     snakemake --cores 1
 ```
 
-5. Output a self-contained interactive HTML report with all results
+1. Output a self-contained interactive HTML report with all results
 ```
     snakemake --report report.html
 ```

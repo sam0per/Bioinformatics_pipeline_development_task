@@ -1,0 +1,10 @@
+channels:
+  - rdonnellyr
+  - main
+  - conda-forge
+dependencies:
+  - r-essentials
+  - r-base
+  - r-optparse
+  - r-ggplot2
+  - r-patchwork
