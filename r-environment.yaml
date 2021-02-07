@@ -1,10 +1,9 @@
 channels:
-  - rdonnellyr
-  - main
   - conda-forge
+  - bioconda
 dependencies:
   - r-essentials
   - r-base
   - r-optparse
-  - r-ggplot2
   - r-patchwork
+  - java-jdk
