@@ -1,0 +1,10 @@
+channels:
+  - bioconda
+  - conda-forge
+  - anaconda
+dependencies:
+  - bcftools =1.11
+  - samtools =1.11
+  - gatk4 =4.1.9.0
+  - java-jdk =8.0.112
+  - snpeff =5.0

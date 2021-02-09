@@ -2,6 +2,7 @@
 .DS_Store
 results/1_read_coverage/chr19_depth.txt
 data/*
+test/*
 .snakemake/*
 results/1_read_coverage/chr19_interval.txt
 results/1_read_coverage/chr19_coverage.txt

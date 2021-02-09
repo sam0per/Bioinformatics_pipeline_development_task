@@ -1,9 +1,0 @@
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - r-essentials
-  - r-base
-  - r-optparse
-  - r-patchwork
-  - java-jdk

@@ -2,23 +2,24 @@
 title: "Analysis Assignment – Pipeline Development"
 author: "Samuel Perini"
 date: "2/5/2021"
-header-includes:
-  - \usepackage{nicefrac}
 output: html_notebook
+header-includes: \usepackage{nicefrac}
+csl: evolution.csl
+bibliography: literature.bib
 ---
 
 The assignment was composed of three main parts: __read coverage, variant calling and analytical performance__. For each part, I report the questions that were asked, the strategy that I have used to answer them and the results that were generated. 
 
 ## (1) Read coverage
 
-In Next Generation Sequencing (NGS) studies, the term “coverage” describes a relation between sequence reads and a reference. A reference can be a whole genome, a specific chromosome or targeted genomic regions. In this assignment, the reference was a region of chromosome 19 of the human genome hg19.  
-The first question of the assignment was:  
+In Next Generation Sequencing (NGS) studies, the term “coverage” describes the number of times that a nucleotide or base in the reference is covered by a high-quality aligned read. A reference can be a whole genome, a specific chromosome or targeted genomic regions and the number of reads that align to, or "cover" it is known as redundancy of coverage and also as the depth or the depth of coverage [@sims2014]. Coverage has also been used to denote the breadth of coverage of a target genome, which is defined as the percentage of target bases that are sequenced a given number of times. For example, a genome sequencing study may sequence a genome to 30X average depth and achieve a 95% breadth of coverage of the reference genome at a minimum depth of ten reads.  
+In this assignment, the reference was a region of chromosome 19 of the human genome hg19 and the first question was:  
 __What can you say about the quality of the read coverage in the sample?__
 
-First, to reduce biased coverage estimates, I have identified and removed read pairs that were likely to have originated from duplicates of the same original DNA fragments through some artifactual processes during sample preparation (e.g., library construction using PCR). For the given sample, ~25% of the aligned reads were estimated to be duplicates and were removed using Picard MarkDuplicates __(REF)__. The data should also be corrected for patterns of systematic errors in the base quality scores which are confidence scores emitted by the sequencer for each base. Base quality scores play an important role in weighing the evidence for or against possible variant alleles during the variant discovery process, so it's important to correct any systematic bias observed in the data. However, because in part 3 of the assignment it was asked to compare between variant calls (i.e., ground truth vs. variants called by the pipeline), I have performed the base quality recalibration step at a later stage of the analysis. I have integrated the statistics of analytical performance (sensitivity, precision and specificity) with information from the recalibration step in order to give an additional view on potential reasons for the difference between variant calls.  
-After filtering out duplicated reads, I have calculated read coverage within the region of chromosome 19 of the human genome hg19 using SAMtools __(REF)__ and deepTools __(REF)__. This genomic interval of chr19 started at position 60,004 and ended at position 14,992,498, for a total length of 14,932,495 bases.
+First, to reduce biased coverage estimates, I have identified and removed read pairs that were likely to have originated from duplicates of the same original DNA fragments through some artifactual processes during sample preparation (e.g., library construction using PCR). For the given sample, ~25% of the aligned reads were estimated to be duplicates and were removed using Picard MarkDuplicates [@picard2018toolkit]. The removal of duplicate reads is expected to reduce non-uniformity of coverage and thus, increase the power to detect variants [@kozarewa2009]. The data should also be corrected for patterns of systematic errors in the base quality scores which are confidence scores emitted by the sequencer for each base. Base quality scores play an important role in weighing the evidence for or against possible variant alleles during the variant discovery process, so it's important to correct any systematic bias observed in the data. However, because in part 3 of the assignment it was asked to compare between variant calls (i.e., ground truth vs. variants called by the pipeline), I have performed the base quality recalibration step at a later stage of the analysis. I have integrated the statistics of analytical performance (sensitivity, precision and specificity) with information from the recalibration step in order to give an additional view on potential reasons for the difference between the two variant calls.  
+After filtering out duplicate reads, I have calculated both the redundancy and breadth of coverage for  high-quality bases ($\geq$Q20) from high-quality alignments ($\geq$MapQ30), within the region of chromosome 19 of the human genome hg19 using SAMtools [@li2009] and deepTools [@ramirez2016deeptools2].
 
-```{bash interval_chr19}
+```{bash interval_chr19, eval=FALSE, include=TRUE}
 # Extract chromosome name, first and last position of the aligned read from the BAM file without duplicates
 samtools view ../Files_needed_for_task/chr19_dedup_sort.bam | awk '{print $3 "\t" $4 "\t" $4+length($10)-1}' > results/1_read_coverage/chr19_interval.txt
 
@@ -26,79 +27,117 @@ samtools view ../Files_needed_for_task/chr19_dedup_sort.bam | awk '{print $3 "\t
 sort -nk2 results/1_read_coverage/chr19_interval.txt | awk 'NR==1{print "min:"$2} END{print "max:"$3}'
 ```
 
-The percentage of the chr19 interval that was covered by at least one read can be calculated as:
+The breadth of coverage or the percentage of the chr19 genomic region that was covered by, for example, a minimum of ten reads was 15%. Thus, the selected interval of chr19 was overall poorly covered (low breadth of coverage) and on average, there were 13 reads per base pair, meaning an average of 13X coverage (Fig. 1 top panel). Even after the removal of duplicate reads, the overall coverage was still non-uniform suggesting that this portion of chr19 is prone to coverage fluctuations due to biases connected with sample preparation, sequencing, genomic alignment and/or assembly.
 
-$\left ( \frac{\text{No. of bases covered}}{\text{chr19 interval}} \right) \times 100$
+For single sample sequencing, which is the case of this assignment, an average of 30-35X coverage has been the standard minimum for generating a reliable variant call [@ajay2011; @sims2014]. Given that the overall fraction of the chr19 region was scarcely covered and that the average coverage was much lower than the current standard, the variant calling output for the given sample should be treated with caution. I expect the variant calling output to contain variants that are not present in the ground truth (false positives) as well as to lack variants that are instead present in the ground truth (false negatives). I expect, of course, to find true positives and true negatives using this pipeline but it will be less sensitive, less precise and less specific at calling variants than the pipeline used for generating the ground truth.
 
-After calculating the number of bases with zero read coverage (11,464,884 bases; see code below), it is possible to obtain the number of bases covered by at least one read $(14,932,495 - 11,464,884 = 3,467,611)$ and so the percentage of 1X coverage $(3,467,611/14,932,495) \times 100 = 23\%$. Thus, the selected interval of chr19 was overall poorly covered and on average, there were 14 reads per base pair meaning an average 14X coverage (Fig. 1). For single sample sequencing, which is the case of this assignment, an average 30X coverage has been a standard minimum for generating a reliable variant call and more recently this minimum has been raised to 50X or 100X coverage, especially in studies on cancer __(REF)__. Given that, in this assignment, the overall fraction of the chr19 region was scarcely covered and that the average coverage was much lower than the current standards, the variant calling output for the given sample should be treated with caution. I expect the variant calling output to contain variants that are not present in the ground truth (false positives) as well as to lack variants that are instead present in the ground truth. I expect, of course, to find true positives and true negatives using this pipeline but it will be less sensitive, less precise and less specific at calling variants than the pipeline used for generating the ground truth.  
-One important note must be made and that is about the statistic that I am using as a base for my expectation. The mean of a continuous variable is meaningful
+```{bash depth, eval=FALSE, include=TRUE}
+# Estimate number of reads per high-quality bases (q20) from high-quality alignments (Q30) 
+samtools depth -a -q 20 -Q 30 -r 19:60004-14992498 ../Files_needed_for_task/chr19_dedup_sort.bam > results/1_read_coverage/chr19_depth.txt
 
-```{bash depth}
-samtools depth ../Files_needed_for_task/chr19_dedup_sort.bam > results/1_read_coverage/chr19_depth.txt
-
-# The first line of the file chr19_cov_redundancy.txt is the number of bases with zero read coverage
 cut -f 3 results/1_read_coverage/chr19_depth.txt | sort | uniq -c > results/1_read_coverage/chr19_cov_redundancy.txt
 
 # Mean coverage
 awk '{ sum += $3 } END { if (NR > 0) print sum / NR }' results/1_read_coverage/chr19_depth.txt
 ```
 
-```{r plot_coverage, eval=TRUE}
+```{r plot_coverage, message=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
 library(ggplot2)
-# Read coverage redundancy table
-redu <- read.table("Bioinformatics_pipeline_development_task/results/1_read_coverage/chr19_cov_redundancy.txt")
-# Reorder
-redu <- redu[order(redu$V2), ]
+library(plotly)
+library(purrr)
+library(dplyr)
+library(patchwork)
 
-# Fraction of bases covered
-redu$prop <- redu$V1/sum(redu$V1)
+# Read coverage per base data (output DeepTools plotCoverage)
+deepT <- read.table("results/1_read_coverage/chr19_coverage.txt")
+deepB <- read.table("results/1_read_coverage/chr19_coverage_target.txt")
+
+# Prepare data for figures
+deepT <- merge(x = deepT, y = deepB, by = c("V1", "V2", "V3"))
+colnames(deepT) <- c("chr", "start", "end", "xxx", "intarget", "outarget")
+# Count number of bases with the same depth
+deepC <- apply(X = deepT[, -1:-3], MARGIN = 2, FUN = function(y) {
+   aggregate(x = deepT$chr, by = list(y), length)
+})
+
+# Merge list of dataframes
+ad <- deepC %>% reduce(left_join, by = "Group.1")
+colnames(ad) <- c("depth", "xxx", "intarget", "outarget") 
+# Replace NAs with 0
+ad$outarget <- ifelse(test = is.na(ad$outarget), yes = 0, no = ad$outarget)
+
+# Calculate "reverse cumulative sum"
+calc_rev <- function(dat, coln, dep_val) {
+   orow <- dat[dat[, 1] %in% dep_val, ]
+   for (i in 1:nrow(orow)) {
+      if (as.numeric(orow[i, 1])==0) {
+         orow[i, paste(coln, "perc", sep = "_")] <- (orow[i, coln]/sum(dat[, coln])) * 100
+      } else {
+         orow[i, paste(coln, "perc", sep = "_")] <- (sum(dat[dat[,1]>=as.numeric(orow[i, 1]), coln])/sum(dat[, coln]))*100
+      }
+   }
+   return(orow[, paste(coln, "perc", sep = "_")])
+}
+ad$xxx_perc <- calc_rev(dat = ad, coln = "xxx", dep_val = ad$depth)
+ad$intarget_perc <- calc_rev(dat = ad, coln = "intarget", dep_val = ad$depth)
+ad$outarget_perc <- calc_rev(dat = ad, coln = "outarget", dep_val = ad$depth)
 
 # Select values of read coverage for the figure
 brks <- c(0:10, 15, seq(20,100,length.out = 9), 125, seq(150, 350,by = 50))
-red_bin <- redu[redu$V2 %in% brks, ]
+red_bin <- ad[ad$depth %in% brks, 1:4]
 
+# Calculate fraction of bases covered
+red_bin$xxx_prop <- red_bin$xxx/sum(red_bin$xxx)
+red_bin$in_prop <- red_bin$intarget/sum(red_bin$intarget)
+red_bin$out_prop <- red_bin$outarget/sum(red_bin$outarget)
+
+dtn <- data.frame(depth=rep(red_bin$depth,3),
+                  prop=c(red_bin$xxx_prop, red_bin$in_prop, red_bin$out_prop),
+                  pal=c(rep("xxx", nrow(red_bin)),
+                        rep("intarget", nrow(red_bin)),
+                        rep("outarget", nrow(red_bin))))
 # Plot fraction of bases against read coverage without the zero coverage
-ggplot(data = red_bin[-1,], aes(x = as.factor(V2), y = prop)) +
-  geom_histogram(stat = "identity") +
-  theme_bw() +
-  labs(x = "Coverage (# reads per bp)", y = "Fraction of bases") +
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 11)) +
-  annotate("text", y = 0.038, x = 25, label="Mean = 14X", hjust=1, vjust=1, size = 6)
-
-# Read coverage per base data (output DeepTools plotCoverage)
-deepT <- read.table("Bioinformatics_pipeline_development_task/results/1_read_coverage/chr19_coverage.txt")
-
-# Plot a "reverse cumulative sum"
-ggplot(deepT, aes(x = V4, y = 1 - ..y..)) +
-   stat_ecdf(size = 1, pad = TRUE) +
-   geom_segment(aes(x = 40, y = -Inf, xend = 40, yend = 0.1), linetype = "dashed") +
-   geom_segment(aes(x = -Inf, y = 0.1, xend = 40, yend = 0.1), linetype = "dashed") +
+ggplot(data = dtn[dtn$depth!=0, ], col = "black") +
+   geom_histogram(aes(x = as.factor(depth), y = prop, fill = pal), stat = "identity",
+                  position = "dodge") +
    theme_bw() +
-   labs(x = "Coverage (# reads per bp)", y = "Fraction of bases >= coverage") +
-   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 11)) +
-   scale_x_continuous(breaks = c(seq(0, 80, by = 20), 200, 400, 600),
-                      labels = c(seq(0, 80, by = 20), 200, 400, 600)) +
-   scale_y_continuous(breaks = c(0.1, seq(0, 1, by = 0.2)),
-                      labels = c(0.1, seq(0, 1, by = 0.2))) +
-   annotate("text", y = 0.2, x = 300, label="10% of the sampled bp have \nat least 40 overlapping reads",
-            hjust=0.5, vjust=1, size = 6)
-```
+   scale_fill_manual(values = c("#ff7f0e", "#2ca02c", "#1f77b4")) +
+   labs(x = "Coverage (# reads per bp)", y = "Fraction of bases", fill = "") +
+   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 9),
+         legend.position = "none") +
+   annotate("text", y = 0.038, x = 25, label="Overall mean = 13X", hjust=1, vjust=1, size = 6, col = "#1f77b4") +
+   annotate("text", y = 0.031, x = 25, label="Target mean = 11X", hjust=1, vjust=1, size = 6, col = "#ff7f0e") +
+   annotate("text", y = 0.024, x = 25, label="Off-target mean = 2X", hjust=1, vjust=1, size = 6,
+            col = "#2ca02c")
 
-![Figure 1. Read coverage at the region of chromosome 19. Left panel: overall mean coverage and fraction of bases of the found read coverages, but not for all of the values. Right panel: fraction of the chr19 region that was covered with a ceratin number of reads.](figures/1_read_coverage/chr19_r_coverage.png){ width=110% }
+# Plot breadth against depth of coverage
+fig <- plot_ly(ad[ad$depth<=200,], x = ~depth)
+fig <- fig %>% add_trace(y = ~xxx_perc, name = 'Overall', type = 'scatter', mode = 'lines')
+fig <- fig %>% add_trace(y = ~intarget_perc, name = 'Target', type = 'scatter', mode = 'lines')
+fig <- fig %>% add_trace(y = ~outarget_perc, name = 'Off-target', type = 'scatter', mode = 'lines')
+fig <- fig %>% layout(xaxis = list(title = "Coverage (# reads per bp)", titlefont = list(size = 18)),
+                      yaxis = list(title = "Percentage of bases >= coverage", titlefont = list(size = 18)),
+                      legend = list(font = list(size = 16)))
+fig
+```
+Figure 1. Read coverage for the overall region of chromosome 19, for the target and off-target region. Top panel: Values of the three means of coverage and fraction of bases of the found read coverages, but not for all the depths. Bottom panel (interactive): Fraction of the chr19 region or breadth of coverage that was covered with a ceratin number of reads.
+
+\  
+
+One important point must be made and that is about the statistic that it is often used for predicting the quality of the variant calling analysis. The mean of a continuous variable is mostly meaningful when the values are normally distributed and the variance is homogeneous. In NGS studies where [e.g., @prabhu2009; @yoon2009] coverage follows a normal distribution and it is homoscedastic, the mean is then a valid proxy for depth of coverage and thus, for predictive the overall power of variant calling. The same criterion applies in studies where coverage is high and uniform across the sequence of reference
+However, coverage data is rarely normally distributed nor homoscedastic suggesting that the mean is not a very appropriate proxy for depth of coverage and thus, may neither be strongly predictive for the reliability of the variant calling output.
 
 The count of the number of overlapping reads tells us how many bases are covered how many times.
 
+it was due to the fact that many of my target regions exhibited high sequence similarity to other regions of the genome. Thus, reads that should have gone to my target regions were being 'robbed' by other regions of similar sequence. This, coupled with other target regions that had relatively 'unique' sequence, results in a distorted coverage profile much more exaggerated than the profile you've posted. It isn't necessarily a problem and I would say that your data is fine. However, set a high mapping quality in order to ensure that your reads have high probability of mapping to the regions that you expect the to.
 
-```{r cov_variation, eval=FALSE}
-# READ DEPTH DATA GENERATED BY SAMTOOLS DEPTH
-dep <- read.table(file = "results/1_read_coverage/chr19_depth.txt")
-colnames(dep) <- c("CHROM", "POS", "DEPTH")
+\  
 
-```
+![Figure. GC content.](figures/1_read_coverage/isochore.1.png){ width=35% } ![Figure. GC content.](figures/1_read_coverage/chr19_gc.png){ width=35% } 
 
-![](figures/1_read_coverage/isochore.1.png){ width=35% } ![](figures/1_read_coverage/chr19_gc.png){ width=35% } 
+\  
 
-
+The transition/transversion ratio (Ti/Tv ratio) is the proportion of the variants observed as transitions (between purines, or between pyrimidines) versus transversions (between purines and pyrimidines). The Ti/Tv ratio is particularly useful for assessing the quality of single nucleotide polymorphisms inferred from sequencing data [31, 32]. A higher ratio generally indicates higher accuracy [27] [@jiang2019].
 
 ## (2) Variant calling
 
@@ -107,3 +146,4 @@ SNPs as presented in public databases like dbSNP (32,33) or HapMap (34) are germ
 
 ## (3) Analytical performance
 
+# References

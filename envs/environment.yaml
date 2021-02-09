@@ -1,0 +1,18 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - snakemake-minimal >=5.24.1
+  - jinja2 =2.11.3
+  - networkx =2.5
+  - matplotlib =3.3.4
+  - graphviz =2.42.3
+  - pysam =0.16.0
+  - qualimap =2.2.2a
+  - pandas =1.2.1
+  - multiqc =1.9
+  - bedtools =2.30.0
+  - deeptools =3.5.0
+  - emboss =6.6.0
+  - picard =2.24.2
+  - java-jdk =8.0.112

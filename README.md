@@ -10,7 +10,7 @@ __2. Variant calling analysis.__
 
 __3. Analytical performance.__
 
-A detailed description of each of the three subjects is presented below and it is based on the questions that were given for this assignment. Additional points were included to clarify analytical steps and results that might be less accessible to those that are less familiar with DNA sequencing and variant calling.  
+This repository contains the scripting files that are necessary for running the pipeline but it does not contain the input data that were given for the assignment. The input data should be downloaded and placed in a directory called `Files_needed_for_task` and this directory should be in the same folder as the repository folder (not inside the repository). For example, both `Files_needed_for_task` and `Bioinformatics_pipeline_development_task` (the repository folder name) directories can be placed inside a folder called `Assignment_Pipeline_Development`.  
 The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html), a Python-based workflow management system, and after [cloning](https://help.github.com/en/articles/cloning-a-repository) this repository, the same bioinformatics steps can be performed by typing the following command line codes:
 
 1. [Install Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
