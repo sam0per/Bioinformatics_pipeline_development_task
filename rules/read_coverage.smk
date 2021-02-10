@@ -1,5 +1,5 @@
 rule chr19_depth:
-    input: "../Files_needed_for_task/chr19_dedup_sort.bam"
+    input: "../Files_needed_for_task/chr19_recal.bam"
     output: "results/1_read_coverage/chr19_depth.txt"
     shell:
         """
@@ -17,7 +17,7 @@ rule chr19_coverage:
         """
 
 rule DeepT_coverage:
-    input: "../Files_needed_for_task/chr19_dedup_sort.bam"
+    input: "../Files_needed_for_task/chr19_recal.bam"
     output:
         bam="../Files_needed_for_task/chr19_rehead.bam",
         fig="figures/1_read_coverage/chr19_coverage",

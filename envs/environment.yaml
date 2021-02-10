@@ -16,3 +16,4 @@ dependencies:
   - emboss =6.6.0
   - picard =2.24.2
   - java-jdk =8.0.112
+  - gatk4 =4.1.9.0

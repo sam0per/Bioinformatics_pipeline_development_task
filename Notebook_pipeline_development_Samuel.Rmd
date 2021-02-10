@@ -3,14 +3,22 @@ title: "Analysis Assignment – Pipeline Development"
 author: "Samuel Perini"
 date: "2/5/2021"
 output: html_notebook
-header-includes: \usepackage{nicefrac}
 csl: evolution.csl
 bibliography: literature.bib
 ---
 
-The assignment was composed of three main parts: __read coverage, variant calling and analytical performance__. For each part, I report the questions that were asked, the strategy that I have used to answer them and the results that were generated. 
+The assignment for the Bioinformatician (Pipeline Development) position at SOPHiA GENETICS was composed of three main parts: __read coverage, variant calling and analytical performance__. The assignment is based on a targeted capture sequencing experiment in which paired-end reads were generated for one sample at selected region of chromosome 19 of the human genome hg19.  
+In this report, I first provide a brief background about capture sequencing technology with respect to the analysis of human diseases, I then describe a bioinformatics workflow that I have implemented specific for this assignment and finally, I lay out the results that were generated in combination with my interpretation. The pipeline and the scripts have been uploaded to GitHub at this [link](https://github.com/sam0per/Bioinformatics_pipeline_development_task)
 
-## (1) Read coverage
+# Background
+
+Whole-exome sequencing analyzes the exons or coding regions of thousands of genes simultaneously using next-generation sequencing techniques. By sequencing the exomeof apatient and comparing itwitha normal reference sequence, variations in an individual’sDNAsequence can be identified and related back to the individual’s medical concerns in an effort to discover the cause of the medical disorder.
+
+# Methods
+
+# Results and Discussion
+
+### (1) Read coverage
 
 In Next Generation Sequencing (NGS) studies, the term “coverage” describes the number of times that a nucleotide or base in the reference is covered by a high-quality aligned read. A reference can be a whole genome, a specific chromosome or targeted genomic regions and the number of reads that align to, or "cover" it is known as redundancy of coverage and also as the depth or the depth of coverage [@sims2014]. Coverage has also been used to denote the breadth of coverage of a target genome, which is defined as the percentage of target bases that are sequenced a given number of times. For example, a genome sequencing study may sequence a genome to 30X average depth and achieve a 95% breadth of coverage of the reference genome at a minimum depth of ten reads.  
 In this assignment, the reference was a region of chromosome 19 of the human genome hg19 and the first question was:  
@@ -18,14 +26,6 @@ __What can you say about the quality of the read coverage in the sample?__
 
 First, to reduce biased coverage estimates, I have identified and removed read pairs that were likely to have originated from duplicates of the same original DNA fragments through some artifactual processes during sample preparation (e.g., library construction using PCR). For the given sample, ~25% of the aligned reads were estimated to be duplicates and were removed using Picard MarkDuplicates [@picard2018toolkit]. The removal of duplicate reads is expected to reduce non-uniformity of coverage and thus, increase the power to detect variants [@kozarewa2009]. The data should also be corrected for patterns of systematic errors in the base quality scores which are confidence scores emitted by the sequencer for each base. Base quality scores play an important role in weighing the evidence for or against possible variant alleles during the variant discovery process, so it's important to correct any systematic bias observed in the data. However, because in part 3 of the assignment it was asked to compare between variant calls (i.e., ground truth vs. variants called by the pipeline), I have performed the base quality recalibration step at a later stage of the analysis. I have integrated the statistics of analytical performance (sensitivity, precision and specificity) with information from the recalibration step in order to give an additional view on potential reasons for the difference between the two variant calls.  
 After filtering out duplicate reads, I have calculated both the redundancy and breadth of coverage for  high-quality bases ($\geq$Q20) from high-quality alignments ($\geq$MapQ30), within the region of chromosome 19 of the human genome hg19 using SAMtools [@li2009] and deepTools [@ramirez2016deeptools2].
-
-```{bash interval_chr19, eval=FALSE, include=TRUE}
-# Extract chromosome name, first and last position of the aligned read from the BAM file without duplicates
-samtools view ../Files_needed_for_task/chr19_dedup_sort.bam | awk '{print $3 "\t" $4 "\t" $4+length($10)-1}' > results/1_read_coverage/chr19_interval.txt
-
-# Print on the screen the first and the last position of the chr19 region
-sort -nk2 results/1_read_coverage/chr19_interval.txt | awk 'NR==1{print "min:"$2} END{print "max:"$3}'
-```
 
 The breadth of coverage or the percentage of the chr19 genomic region that was covered by, for example, a minimum of ten reads was 15%. Thus, the selected interval of chr19 was overall poorly covered (low breadth of coverage) and on average, there were 13 reads per base pair, meaning an average of 13X coverage (Fig. 1 top panel). Even after the removal of duplicate reads, the overall coverage was still non-uniform suggesting that this portion of chr19 is prone to coverage fluctuations due to biases connected with sample preparation, sequencing, genomic alignment and/or assembly.
 
@@ -120,7 +120,7 @@ fig <- fig %>% layout(xaxis = list(title = "Coverage (# reads per bp)", titlefon
                       legend = list(font = list(size = 16)))
 fig
 ```
-Figure 1. Read coverage for the overall region of chromosome 19, for the target and off-target region. Top panel: Values of the three means of coverage and fraction of bases of the found read coverages, but not for all the depths. Bottom panel (interactive): Fraction of the chr19 region or breadth of coverage that was covered with a ceratin number of reads.
+Figure 1. Read coverage for the overall region of chromosome 19, for the target and off-target region. Top panel: Values of the three means of coverage and fraction of bases of the found read depths, but not for all the depths. Bottom panel (interactive): Fraction of the chr19 region or breadth of coverage that was covered with a certain number of reads.
 
 \  
 
@@ -139,11 +139,11 @@ it was due to the fact that many of my target regions exhibited high sequence si
 
 The transition/transversion ratio (Ti/Tv ratio) is the proportion of the variants observed as transitions (between purines, or between pyrimidines) versus transversions (between purines and pyrimidines). The Ti/Tv ratio is particularly useful for assessing the quality of single nucleotide polymorphisms inferred from sequencing data [31, 32]. A higher ratio generally indicates higher accuracy [27] [@jiang2019].
 
-## (2) Variant calling
+### (2) Variant calling
 
 SNPs as presented in public databases like dbSNP (32,33) or HapMap (34) are germline variations for which at most population frequencies are known. In literature it is usually assumed that the variation should be found in more than 1% of the population in order to be called a SNP. Such information is very useful for biomarker development since it describes the prevalence of the mutation in different populations. However, it is normally not possible to get additional information (like gender, age, or disease status) on the individuals having the SNP, only the population a person belongs to is given. Since it is not known if the information comes from a tumor or normal sample, a correlation between diseases and SNPs cannot be calculated.
 
 
-## (3) Analytical performance
+### (3) Analytical performance
 
 # References

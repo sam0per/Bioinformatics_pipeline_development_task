@@ -1,0 +1,2 @@
+Module	Section	Sample Name	Source
+Picard	DuplicationMetrics	chr19	/Users/samuelperini/Documents/sophia_gen/Bioinformatics (pipeline development) task/Bioinformatics_pipeline_development_task/results/qc/chr19_dedup.metrics.txt
