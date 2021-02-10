@@ -1,2 +1,0 @@
-Sample	Picard_mqc-generalstats-picard-PERCENT_DUPLICATION
-chr19	0.247611

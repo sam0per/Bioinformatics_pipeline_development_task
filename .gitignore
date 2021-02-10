@@ -8,3 +8,4 @@ test/*
 results/1_read_coverage/chr19_interval.txt
 results/1_read_coverage/chr19_coverage.txt
 results/annotation/*.vcf
+envs/r-envir/*

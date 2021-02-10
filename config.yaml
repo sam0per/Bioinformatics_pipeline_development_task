@@ -1,0 +1,39 @@
+sample: chr19
+
+dbSNP:
+  # download site
+  site: https://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/VCF/common_all_20180423.vcf.gz
+  # save download to
+  path: data/common_all_20180423.vcf.gz
+  # chromosome of interest
+  chr: 19
+
+ref:
+  # download site
+  site: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/chromosomes/chr19.fa.gz
+  # ensembl release
+  release: hg19
+  # region of interest
+  reg: 19:60677-14992498
+
+picard_config:
+  HsMetrics_table_cols:
+    - NEAR_BAIT_BASES
+    - ON_BAIT_BASES
+    - MEAN_TARGET_COVERAGE
+    - ON_BAIT_VS_SELECTED
+    - MEDIAN_TARGET_COVERAGE
+    - ZERO_CVG_TARGETS_PCT
+    - PCT_EXC_OFF_TARGET
+    - PCT_TARGET_BASES_10X
+    - PCT_TARGET_BASES_30X
+    - PCT_TARGET_BASES_100X
+    - AT_DROPOUT
+    - GC_DROPOUT
+  HsMetrics_table_cols_hidden:
+    - MAX_TARGET_COVERAGE
+    - MEAN_BAIT_COVERAGE
+    - OFF_BAIT_BASES
+
+modules:
+  r: envs/r_env/bin/R

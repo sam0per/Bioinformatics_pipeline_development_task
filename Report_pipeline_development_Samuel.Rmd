@@ -12,9 +12,15 @@ In this report, I first provide a brief background about capture sequencing tech
 
 # Background
 
+Protein coding genes constitute only approximately 1% of the human genome but harbor 85% of the 
+
+Genetic mutations in protein coding genes are very likely to disrupt important biological functions which, in the case  with large effects on human disease-related traits . Therefore, efficient strategies for selectively sequencing complete coding regions (i.e., ‘‘whole exome’’) have thepotential to contribute to the understanding of rare and common human diseases. 
+
 Whole-exome sequencing analyzes the exons or coding regions of thousands of genes simultaneously using next-generation sequencing techniques. By sequencing the exomeof apatient and comparing itwitha normal reference sequence, variations in an individual’sDNAsequence can be identified and related back to the individual’s medical concerns in an effort to discover the cause of the medical disorder.
 
 # Methods
+
+Duplicate reads ... Unique reads were retained and they were all aligned and paired properly.
 
 # Results and Discussion
 
