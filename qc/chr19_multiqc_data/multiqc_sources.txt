@@ -1,0 +1,5 @@
+Module	Section	Sample Name	Source
+deepTools	plotCoverage	deep_coverage_chr19	/Users/samuelperini/Documents/sophia_gen/pipeline_development_task/Bioinformatics_pipeline_development_task/results/qc/deep_coverage_chr19.txt
+Picard	HsMetrics	chr19_RG	/Users/samuelperini/Documents/sophia_gen/pipeline_development_task/Bioinformatics_pipeline_development_task/results/qc/chr19_hs_metrics.txt
+Picard	DuplicationMetrics	chr19	/Users/samuelperini/Documents/sophia_gen/pipeline_development_task/Bioinformatics_pipeline_development_task/results/qc/chr19_dedup.metrics.txt
+Samtools	stats	chr19_samtools.metrics	/Users/samuelperini/Documents/sophia_gen/pipeline_development_task/Bioinformatics_pipeline_development_task/results/qc/chr19_samtools.metrics.txt

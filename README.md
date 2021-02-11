@@ -22,9 +22,11 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     conda activate pipeline_development
 ```
 
-1. Create a second environment called "r_env" with the required software listed inside a different YAML file. This environment will be activated inside the pipeline to avoid conflicting packages.
+1. Create other environments with the required up-to-date software listed inside different YAML files. The packages of these new environments will be activated inside the pipeline to avoid conflicts with the main environment. Just run the commands below to create them but do not activate these new environments.
 ```
-    conda env create --name r_env --file r-environment.yaml
+    conda env create --prefix ./envs/r-envir --file envs/r-environment.yaml
+    conda env create --prefix ./envs/var_call_v1 --file ./envs/var-call-env1.yaml
+    conda env create --prefix ./envs/var_call_v2 --file ./envs/var-call-env2.yaml
 ```
 
 1. Download human assembly hg19, chromosome 19 FASTA file and chromosome 19 dbSNP BED file
@@ -40,7 +42,7 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     cd ../
 ```
 
-1. Execute the workflow locally using 1 core (change the number of cores as you wish)
+1. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
 ```
     snakemake --cores 1
 ```

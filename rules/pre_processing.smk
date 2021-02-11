@@ -18,7 +18,7 @@ rule mark_duplicates:
         samtools index {output.sortbam}
         """
 
-rule base_recal:
+rule fasta:
     input: "data/{sample}_dedup_sort.bam"
     output:
         fas="data/{sample}.fa",

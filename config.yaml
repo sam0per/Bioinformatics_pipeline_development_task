@@ -9,8 +9,9 @@ dbSNP:
   chr: 19
 
 ref:
-  # download site
+  # download from site
   site: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/chromosomes/chr19.fa.gz
+  2bit: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit
   # ensembl release
   release: hg19
   # region of interest
@@ -36,4 +37,5 @@ picard_config:
     - OFF_BAIT_BASES
 
 modules:
-  r: envs/r_env/bin/R
+  r: envs/r-envir/bin/Rscript
+  bcf: envs/var_call_v1/bin/bcftools

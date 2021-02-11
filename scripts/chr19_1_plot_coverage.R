@@ -13,94 +13,101 @@ option_list = list(
   make_option(c("-x", "--overall"), type = "character", default = NULL,
               help = "Overall read coverage per base data (output DeepTools plotCoverage).", metavar = "character"),
   make_option(c("-t", "--target"), type = "character", default = NULL,
-              help = "In- and off-target read coverage per base data (output DeepTools plotCoverage).", metavar = "character"),
+              help = "In-target read coverage per base data (output DeepTools plotCoverage).",
+              metavar = "character"),
+  make_option(c("-f", "--oftarget"), type = "character", default = NULL,
+              help = "Off-target read coverage per base data (output DeepTools plotCoverage).",
+              metavar = "character"),
   make_option(c("-o", "--output"), type = "character", default = NULL,
-              help = "Filename of the output figure without extension.", metavar = "character"))
+              help = "Filename of the output figure.", metavar = "character"))
 
 opt_parser = OptionParser(usage = paste("Rscript scripts/chr19_1_plot_coverage.R",
-                                        "-x results/1_read_coverage/chr19_coverage.txt",
-                                        "-t results/1_read_coverage/chr19_coverage_target.txt",
-                                        "-o figures/1_read_coverage/chr19_r_coverage"),
+                                        "-x results/1_read_coverage/deep_coverage_chr19.txt",
+                                        "-t results/1_read_coverage/deep_chr19_11_coverage.txt",
+                                        "-f results/1_read_coverage/deep_chr19_00_coverage.txt",
+                                        "-o figures/1_read_coverage/chr19_r_coverage.png"),
                           option_list=option_list,
-                          description = "Report two figures that tell you how many bases are covered how many times.")
+                          description = "Report one figure that tells you how many bases are covered how many times.")
 opt = parse_args(opt_parser)
 
-if (is.null(opt$overall) | is.null(opt$target) | is.null(opt$output)) {
+if (is.null(opt$overall) | is.null(opt$target) | is.null(opt$oftarget) | is.null(opt$output)) {
   print_help(opt_parser)
   stop("All the arguments must be supplied.\n", call.=FALSE)
 }
 
 # Read coverage per base data (output DeepTools plotCoverage)
+# and sub-sample randomly without replacement
 deepT <- read.table(opt$overall)
+deepT$exp <- "overall"
+idt <- deepT[sample(x = 1:nrow(deepT), size = 10000, replace = FALSE), ]
+
 deepB <- read.table(opt$target)
+deepB$exp <- "target"
+idb <- deepB[sample(x = 1:nrow(deepB), size = 10000, replace = FALSE), ]
 
-# Prepare data for figures
-deepT <- merge(x = deepT, y = deepB, by = c("V1", "V2", "V3"))
-colnames(deepT) <- c("chr", "start", "end", "xxx", "intarget", "outarget")
-# Count number of bases with the same depth
-deepC <- apply(X = deepT[, -1:-3], MARGIN = 2, FUN = function(y) {
-  aggregate(x = deepT$chr, by = list(y), length)
-})
+deepO <- read.table(opt$oftarget)
+deepO$exp <- "oftarget"
+ido <- deepO[sample(x = 1:nrow(deepO), size = 10000, replace = FALSE), ]
 
-# Merge list of dataframes
-ad <- deepC %>% reduce(left_join, by = "Group.1")
-colnames(ad) <- c("depth", "xxx", "intarget", "outarget") 
-# Replace NAs with 0
-ad$outarget <- ifelse(test = is.na(ad$outarget), yes = 0, no = ad$outarget)
+rm(list = c("deepB", "deepO", "deepT"))
 
-# Calculate "reverse cumulative sum"
-calc_rev <- function(dat, coln, dep_val) {
-  orow <- dat[dat[, 1] %in% dep_val, ]
-  for (i in 1:nrow(orow)) {
-    if (as.numeric(orow[i, 1])==0) {
-      orow[i, paste(coln, "perc", sep = "_")] <- (orow[i, coln]/sum(dat[, coln])) * 100
-    } else {
-      orow[i, paste(coln, "perc", sep = "_")] <- (sum(dat[dat[,1]>=as.numeric(orow[i, 1]), coln])/sum(dat[, coln]))*100
-    }
-  }
-  return(orow[, paste(coln, "perc", sep = "_")])
-}
-ad$xxx_perc <- calc_rev(dat = ad, coln = "xxx", dep_val = ad$depth)
-ad$intarget_perc <- calc_rev(dat = ad, coln = "intarget", dep_val = ad$depth)
-ad$outarget_perc <- calc_rev(dat = ad, coln = "outarget", dep_val = ad$depth)
+idt <- idt[order(idt$V2),]
+# mean(idt$V4)
+idb <- idb[order(idb$V2),]
+# mean(idb$V4)
+ido <- ido[order(ido$V2),]
+# mean(ido$V4)
 
-# Select values of read coverage for the figure
-brks <- c(0:10, 15, seq(20,100,length.out = 9), 125, seq(150, 350,by = 50))
-red_bin <- ad[ad$depth %in% brks, 1:4]
-
-# Calculate fraction of bases covered
-red_bin$xxx_prop <- red_bin$xxx/sum(red_bin$xxx)
-red_bin$in_prop <- red_bin$intarget/sum(red_bin$intarget)
-red_bin$out_prop <- red_bin$outarget/sum(red_bin$outarget)
-
-dtn <- data.frame(depth=rep(red_bin$depth,3),
-                  prop=c(red_bin$xxx_prop, red_bin$in_prop, red_bin$out_prop),
-                  pal=c(rep("xxx", nrow(red_bin)),
-                        rep("intarget", nrow(red_bin)),
-                        rep("outarget", nrow(red_bin))))
-# Plot fraction of bases against read coverage without the zero coverage
-p_deep <- ggplot(data = dtn[dtn$depth!=0, ], col = "black") +
-  geom_histogram(aes(x = as.factor(depth), y = prop, fill = pal), stat = "identity",
-                 position = "dodge") +
+# Plot depth against chr position
+p_deep <- ggplot(data = idb) +
+  geom_point(aes(x = V2, y = V4, col = "target"), alpha = 0.5) +
+  geom_point(data = ido, aes(x = V2, y = V4, col = "off-target"), alpha = 0.5) +
+  geom_point(data = idt, aes(x = V2, y = V4, col = "overall"), alpha = 0.5) +
   theme_bw() +
-  scale_fill_manual(values = c("#ff7f0e", "#2ca02c", "#1f77b4")) +
-  labs(x = "Coverage (# reads per bp)", y = "Fraction of bases", fill = "") +
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 9),
-        legend.position = "none") +
-  annotate("text", y = 0.038, x = 25, label="Overall mean = 13X", hjust=1, vjust=1, size = 6, col = "#1f77b4") +
-  annotate("text", y = 0.031, x = 25, label="Target mean = 11X", hjust=1, vjust=1, size = 6, col = "#ff7f0e") +
-  annotate("text", y = 0.024, x = 25, label="Off-target mean = 2X", hjust=1, vjust=1, size = 6,
-           col = "#2ca02c")
+  scale_color_manual(values = c("#2ca02c", "#1f77b4", "#ff7f0e")) +
+  labs(x = "portion of chromosome 19", y = "depth of coverage", col = "") +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14),
+        legend.position = "top", legend.text = element_text(size = 16)) +
+  annotate("text", y = 510, x = 2550000, label="off-target mean = 29X", hjust=0.5, vjust=1, size = 6, col = "#2ca02c") +
+  annotate("text", y = 560, x = 7500000, label="overall mean = 13X", hjust=0.5, vjust=1, size = 6, col = "#1f77b4") +
+  annotate("text", y = 510, x = 12550000, label="in-target mean = 144X", hjust=0.5, vjust=1, size = 6,
+           col = "#ff7f0e") +
+  guides(col = guide_legend(override.aes = list(size = 5)))
+# p_deep
 
-ggsave(filename = paste0(opt$output, ".png"), plot = p_deep, width = 10, height = 7, dpi = "screen")
+# Overdispersion and uniformity of coverage
+# Negative binomial model
+# Overall data
+m1 <- glm.nb(V4 ~ 1, data = idt)
+cat("\nOverall depth of coverage:")
+uci <- round(1/(m1$theta - 2*m1$SE.theta), 3)
+lci <- round(1/(m1$theta + 2*m1$SE.theta), 3)
+cat("Dispersion parameter = ", round(1/m1$theta, 3), " [", lci, "-", uci, "]", "\n", sep = "")
 
-# Plot breadth against depth of coverage
-fig <- plot_ly(ad[ad$depth<=200,], x = ~depth)
-fig <- fig %>% add_trace(y = ~xxx_perc, name = 'Overall', type = 'scatter', mode = 'lines')
-fig <- fig %>% add_trace(y = ~intarget_perc, name = 'Target', type = 'scatter', mode = 'lines')
-fig <- fig %>% add_trace(y = ~outarget_perc, name = 'Off-target', type = 'scatter', mode = 'lines')
-fig <- fig %>% layout(xaxis = list(title = "Coverage (# reads per bp)", titlefont = list(size = 18)),
-                      yaxis = list(title = "Percentage of bases >= coverage", titlefont = list(size = 18)),
-                      legend = list(font = list(size = 16)))
+# Target data
+m2 <- glm.nb(V4 ~ 1, data = idb)
+cat("\nTarget depth of coverage:")
+uci <- round(1/(m2$theta - 2*m2$SE.theta), 3)
+lci <- round(1/(m2$theta + 2*m2$SE.theta), 3)
+cat("Dispersion parameter = ", round(1/m2$theta, 3), " [", lci, "-", uci, "]", "\n", sep = "")
 
-saveWidget(widget = fig, file = paste0(basename(opt$output), ".html"))
+# Off-target data
+m3 <- glm.nb(V4 ~ 1, data = ido)
+cat("\nOff-target depth of coverage:")
+uci <- round(1/(m3$theta - 2*m3$SE.theta), 3)
+lci <- round(1/(m3$theta + 2*m3$SE.theta), 3)
+cat("Dispersion parameter = ", round(1/m3$theta, 3), " [", lci, "-", uci, "]", "\n", sep = "")
+
+# Add dispersion results to figure
+p_deep <- p_deep +
+  geom_text(aes(x = 2550000, y = 510-30, label=paste0("dispersion = ", round(1/m3$theta, 3))),
+            hjust=0.5, vjust=1, size = 5, col = "#2ca02c", data = data.frame()) +
+  geom_text(aes(y = 560-30, x = 7500000), label=paste0("dispersion = ", round(1/m1$theta, 3)),
+            hjust=0.5, vjust=1, size = 5, col = "#1f77b4", data = data.frame()) +
+  geom_text(aes(y = 510-30, x = 12550000), label=paste0("dispersion = ", round(1/m2$theta, 3)),
+            hjust=0.5, vjust=1, size = 5, col = "#ff7f0e", data = data.frame())
+
+# Save figure
+ggsave(filename = paste0(opt$output), plot = p_deep, width = 10, height = 7, dpi = "screen")
+
+cat("...MISSION COMPLETE...\n")

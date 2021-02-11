@@ -9,18 +9,18 @@ rule all_depth:
         awk '{{ sum += $3 }} END {{ if (NR > 0) print "Overall mean coverage: " sum / NR "X" }}' {output}
         """
 
-import os
 rule DeepT_coverage:
     input: "data/{sample}_RG.bam"
     output:
-        fig="figures/1_read_coverage/{sample}_coverage",
-        dat="results/1_read_coverage/deep_{sample}_coverage.txt"
+        # fig="figures/1_read_coverage/{sample}_coverage",
+        dat="results/1_read_coverage/deep_coverage_{sample}.txt"
     params:
         reg=os.path.basename(config["ref"]["reg"]).replace("-", ":")
     shell:
         """
-        plotCoverage -b {input} --plotFile {output.fig} --ignoreDuplicates \
-        --minMappingQuality 30 -r {params.reg} --outRawCounts {output.dat} -n 100000
+        plotCoverage -b {input} --ignoreDuplicates \
+        --minMappingQuality 30 -r {params.reg} --outRawCounts {output.dat} -n 100000 \
+        -p max/2
         """
 
 rule intersect:
@@ -28,33 +28,53 @@ rule intersect:
         bam="data/{sample}_RG.bam",
         bed="../Files_needed_for_task/target_regions.bed"
     output:
-        inbam="results/1_read_coverage/{sample}_intarget.bam",
-        inbed="results/1_read_coverage/{sample}_intarget.bed",
-        oubed="results/1_read_coverage/{sample}_outarget.bed"
+        inbam="results/1_read_coverage/{sample}_11.bam",
+        ofbam="results/1_read_coverage/{sample}_00.bam"
+    shell:
+        # awk -v OFS='\\t''$1="chr"$1' {input.bed} > ../Files_needed_for_task/target_regions_chr.bed
+        """
+        bedtools intersect -abam {input.bam} -b {input.bed} > {output.inbam}
+        bedtools intersect -abam {input.bam} -b {input.bed} -v > {output.ofbam}
+        bedtools intersect -abam {input.bam} -b {input.bed} -v -bed | \
+        cut -f 1,2,3 > {output.ofbam}.bed
+        samtools index {output.inbam}
+        samtools index {output.ofbam}
+        """
+
+rule DeepT_target:
+    input:
+        inbam="results/1_read_coverage/{sample}_11.bam",
+        inbed="../Files_needed_for_task/target_regions.bed",
+        ofbam="results/1_read_coverage/{sample}_00.bam"
+    output:
+        indat="results/1_read_coverage/deep_{sample}_11_coverage.txt",
+        ofdat="results/1_read_coverage/deep_{sample}_00_coverage.txt"
+    params:
+        reg=os.path.basename(config["ref"]["reg"]).replace("-", ":")
     shell:
         """
-        # awk -v OFS='\\t''$1="chr"$1' {input.bed} > ../Files_needed_for_task/target_regions_chr.bed
-        bedtools intersect -abam {input.bam} -b {input.bed} > {output.inbam}
-        bedtools intersect -abam {input.bam} -b {input.bed} -bed > {output.inbed}
-        bedtools intersect -abam {input.bam} -b {input.bed} -v > {output.oubed}
+        # In-target
+        plotCoverage -b {input.inbam} --ignoreDuplicates \
+        --minMappingQuality 30 -r {params.reg} --outRawCounts {output.indat} -n 100000 --BED {input.inbed} \
+        -p max/2
         
-        # Mean depth for on- and off-target
-        bedtools coverage -a {input.bed} -b {input.bam} -mean \
-        > results/1_read_coverage/{wildcards.sample}_intarget_mean.bedgraph
-        bedtools coverage -a {output.oubed} -b {input.bam} -mean \
-        > results/1_read_coverage/{wildcards.sample}_outarget_mean.bedgraph
+        # Of-target
+        plotCoverage -b {input.ofbam} --ignoreDuplicates \
+        --minMappingQuality 30 -r {params.reg} --outRawCounts {output.ofdat} -n 100000 --BED {input.ofbam}.bed \
+        -p max/2
         """
 
 rule plot_coverage:
     input:
-        who="results/1_read_coverage/deep_{sample}_coverage.txt",
-        tar="results/1_read_coverage/{sample}_intarget.bed"
+        who="results/1_read_coverage/deep_coverage_{sample}.txt",
+        inr="results/1_read_coverage/deep_{sample}_11_coverage.txt",
+        our="results/1_read_coverage/deep_{sample}_00_coverage.txt"
     output: "figures/1_read_coverage/{sample}_r_coverage.png"
     params:
         r=config["modules"]["r"]
     shell:
         """
-        {params.r} scripts/chr19_1_plot_coverage.R -x {input.who} -t {input.tar} -o {output}
+        {params.r} scripts/chr19_1_plot_coverage.R -x {input.who} -t {input.inr} -f {input.our} -o {output}
         """
 
 rule hs_metrics:
@@ -66,6 +86,7 @@ rule hs_metrics:
         hs="results/qc/{sample}_hs_metrics.txt"
     shell:
         """
-        picard BedToIntervalList I={input.bed} O={output.ls} SD={input.bam}
-        picard CollectHsMetrics I={input.bam} O={output.hs}
+        picard BedToIntervalList I={input.bed} O={output.ls} SD={input.bam} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        picard CollectHsMetrics I={input.bam} O={output.hs} BAIT_INTERVALS={output.ls} \
+        TARGET_INTERVALS={output.ls} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         """
