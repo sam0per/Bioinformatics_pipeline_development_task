@@ -10,7 +10,14 @@ __2. Variant calling analysis.__
 
 __3. Analytical performance.__
 
-This repository contains the scripting files that are necessary for running the pipeline but it does not contain the input data that were given for the assignment. The input data should be downloaded and placed in a directory called `Files_needed_for_task` and this directory should be in the same folder as the repository folder (not inside the repository). For example, both `Files_needed_for_task` and `Bioinformatics_pipeline_development_task` (the repository folder name) directories can be placed inside a folder called `Assignment_Pipeline_Development`.  
+This repository contains the scripting files that are necessary for running the pipeline but it does not contain the input data that were given for the assignment. The input data should be downloaded and placed in a directory called `Files_needed_for_task` and this directory should be in the same folder as the repository folder (not inside the repository). For example, both `Files_needed_for_task` and `Bioinformatics_pipeline_development_task` (the repository folder name) directories can be placed inside a folder called `Assignment_Pipeline_Development`.
+
+```
+Assignment_Pipeline_Development/
+├── Bioinformatics_pipeline_development_task
+└── Files_needed_for_task
+```
+
 The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html), a Python-based workflow management system, and after [cloning](https://help.github.com/en/articles/cloning-a-repository) this repository, the same bioinformatics steps can be performed by typing the following command line codes:
 
 1. [Install Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
@@ -44,7 +51,7 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
 
 1. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
 ```
-    snakemake --cores 1
+    snakemake -p --cores 1
 ```
 
 1. Output a self-contained interactive HTML report with all results
