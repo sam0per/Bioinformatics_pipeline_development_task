@@ -46,7 +46,8 @@ rule DeepT_target:
     input:
         inbam="results/1_read_coverage/{sample}_11.bam",
         inbed=config["target"],
-        ofbam="results/1_read_coverage/{sample}_00.bam"
+        ofbam="results/1_read_coverage/{sample}_00.bam",
+        ofbed="results/1_read_coverage/{sample}_00.bed"
     output:
         indat="results/1_read_coverage/deep_{sample}_11_coverage.txt",
         ofdat="results/1_read_coverage/deep_{sample}_00_coverage.txt"
@@ -61,7 +62,7 @@ rule DeepT_target:
         
         # Of-target
         plotCoverage -b {input.ofbam} --ignoreDuplicates \
-        --minMappingQuality 30 -r {params.reg} --outRawCounts {output.ofdat} -n 100000 --BED {input.ofbam}.bed \
+        --minMappingQuality 30 -r {params.reg} --outRawCounts {output.ofdat} -n 100000 --BED {input.ofbed} \
         -p max/2
         """
 

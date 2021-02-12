@@ -14,9 +14,9 @@ In this report, I first provide a brief background about capture sequencing tech
 
 Protein coding genes constitute only approximately 1% of the human genome but harbor 85% of the
 
-Genetic mutations in protein coding genes are very likely to disrupt important biological functions which, in the case  with large effects on human disease-related traits . Therefore, efficient strategies for selectively sequencing complete coding regions (i.e., ‘‘whole exome’’) have thepotential to contribute to the understanding of rare and common human diseases. 
+Genetic mutations in protein coding genes are very likely to disrupt important biological functions and studying how these mutations appear and evolve is key for understanding disease-related traits in humans. Efficient strategies have been developed for selectively sequencing complete coding regions (i.e., ‘‘whole exome’’) and analysing thousands of genes simultaneously using next-generation sequencing techniques. For einstance, by sequencing the exome of a patient and comparing it with a normal reference sequence, variations in an individual’s DNA sequence can be identified and related back to the individual’s medical concerns in an effort to discover the cause of the medical disorder.
 
-Whole-exome sequencing analyzes the exons or coding regions of thousands of genes simultaneously using next-generation sequencing techniques. By sequencing the exomeof apatient and comparing itwitha normal reference sequence, variations in an individual’sDNAsequence can be identified and related back to the individual’s medical concerns in an effort to discover the cause of the medical disorder.
+In Next Generation Sequencing (NGS) studies, the term “coverage” describes the number of times that a nucleotide or base in the reference is covered by a high-quality aligned read. A reference can be a whole genome, a specific chromosome or targeted genomic regions and the number of reads that align to, or "cover" it is known as redundancy of coverage and also as the depth or the depth of coverage [@sims2014]. Coverage has also been used to denote the breadth of coverage of a target genome, which is defined as the percentage of target bases that are sequenced a given number of times. For example, a genome sequencing study may sequence a genome to 30X average depth and achieve a 95% breadth of coverage of the reference genome at a minimum depth of ten reads.  
 
 Whole genome sequencing (WGS) and Whole exome sequencing (WES) methods are applied in clinical settings for detecting patient’s genomic variants and etiology of the disease. Whole exome sequencing (WES), is becoming a standard, more economic approach to genome sequencing [1]. Although it covers only exonic regions (< 2% of the whole genome), it produces a large quantity of data (raw reads) that requires a significant amount of bioinformatics analysis to create biologically meaningful information [2]. [@kumaran2019]
 
@@ -25,6 +25,8 @@ Next-generation sequencing (NGS) is rapidly becoming an invaluable tool in human
 Early comparative studies have focused on comparison of target intervals of various exome kits, and identified several important biases inherent to WES technology, such as coverage biases in regions with very high or low GC content9,10,11 [@barbitoff2020]
 
 # Methods
+
+For this assignment, I was provided with three files: 
 
 Duplicate reads ... Unique reads were retained and they were all aligned and paired properly.
 
