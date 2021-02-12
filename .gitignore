@@ -1,8 +1,6 @@
 .snakemake/*
 .DS_Store
 data/*
-figures/*
-figures/1_read_coverage/*
 logs/*
 qc/*
 results/*
