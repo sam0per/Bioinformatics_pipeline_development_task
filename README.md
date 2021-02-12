@@ -22,21 +22,21 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
 
 1. [Install Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
-1. Create an environment called "pipeline_development" with the required software listed inside the YAML file and activate it
+2. Create an environment called "pipeline_development" with the required software listed inside the YAML file and activate it
 ```
     cd Bioinformatics_pipeline_development_task
     conda env create --name pipeline_development --file environment.yaml
     conda activate pipeline_development
 ```
 
-1. Create other environments with the required up-to-date software listed inside different YAML files. The packages of these new environments will be activated inside the pipeline to avoid conflicts with the main environment. Just run the commands below to create them but do not activate these new environments.
+3. Create other environments with the required up-to-date software listed inside different YAML files. The packages of these new environments will be activated inside the pipeline to avoid conflicts with the main environment. Just run the commands below to create them but do not activate these new environments.
 ```
     conda env create --prefix ./envs/r-envir --file envs/r-environment.yaml
     conda env create --prefix ./envs/var_call_v1 --file ./envs/var-call-env1.yaml
     conda env create --prefix ./envs/var_call_v2 --file ./envs/var-call-env2.yaml
 ```
 
-1. Download human assembly hg19, chromosome 19 FASTA file and chromosome 19 dbSNP BED file
+4. Download human assembly hg19, chromosome 19 FASTA file and chromosome 19 dbSNP BED file
 ```
     mkdir data
     cd data
@@ -49,12 +49,7 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     cd ../
 ```
 
-1. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
+5. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
 ```
     snakemake -p --cores 1
-```
-
-1. Output a self-contained interactive HTML report with all results
-```
-    snakemake --report report.html
 ```
