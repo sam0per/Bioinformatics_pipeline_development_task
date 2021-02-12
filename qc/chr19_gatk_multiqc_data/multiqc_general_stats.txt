@@ -1,6 +1,0 @@
-Sample	Picard_mqc-generalstats-picard-PERCENT_DUPLICATION	Picard_mqc-generalstats-picard-FOLD_ENRICHMENT	Picard_mqc-generalstats-picard-PCT_TARGET_BASES_30X	Bcftools Stats_mqc-generalstats-bcftools_stats-number_of_records	Bcftools Stats_mqc-generalstats-bcftools_stats-number_of_SNPs	Bcftools Stats_mqc-generalstats-bcftools_stats-number_of_indels	Bcftools Stats_mqc-generalstats-bcftools_stats-tstv	Bcftools Stats_mqc-generalstats-bcftools_stats-number_of_MNPs	Samtools_mqc-generalstats-samtools-error_rate	Samtools_mqc-generalstats-samtools-non_primary_alignments	Samtools_mqc-generalstats-samtools-reads_mapped	Samtools_mqc-generalstats-samtools-reads_mapped_percent	Samtools_mqc-generalstats-samtools-reads_properly_paired_percent	Samtools_mqc-generalstats-samtools-reads_MQ0_percent	Samtools_mqc-generalstats-samtools-raw_total_sequences
-chr19	0.247611														
-chr19_RG		2254.924267	0.985532												
-chr19_filt				854.0	741.0	113.0	2.25	0.0							
-chr19_filt.gatk				324.0	323.0	1.0	3.19	0.0							
-chr19_samtools.metrics									0.003823634	0.0	1353150.0	100.0	100.0	0.6852159775339024	1353150.0
