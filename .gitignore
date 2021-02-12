@@ -1,10 +1,12 @@
-
+.snakemake/*
 .DS_Store
 data/*
+figures/*
 logs/*
-test/*
-.snakemake/*
+qc/*
 results/*
 envs/r-envir/*
 envs/var_call_v1/*
 envs/var_call_v2/*
+test/*
+tmp/*

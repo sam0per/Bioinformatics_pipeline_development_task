@@ -36,20 +36,9 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     conda env create --prefix ./envs/var_call_v2 --file ./envs/var-call-env2.yaml
 ```
 
-4. Download human assembly hg19, chromosome 19 FASTA file and chromosome 19 dbSNP BED file
-```
-    mkdir data
-    cd data
-    rsync -avzP rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit .
-    rsync -avzP rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz .
-    gunzip hg19.fa.gz
-    wget http://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/chr19.fa.gz
-    gunzip chr19.fa.gz
-    wget ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/bed_chr_19.bed.gz
-    cd ../
-```
-
-5. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
+4. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
 ```
     snakemake -p --cores 1
 ```
+
+The main output is the [MultiQC](https://multiqc.info/) HTML file `qc/chr19_multiqc.html` which contains summary statistics and interactive plots that will help understanding the HTML report `Report_pipeline_development_Samuel.nb.html`.

@@ -1,16 +1,7 @@
 import os
-import pandas as pd
 configfile: "config.yaml"
 
-# callers_tb = pd.read_table(config["caller_file"], dtype=str).set_index("caller", drop=False)
-# caller=callers_tb.index.values
-
-# callers_names = {"gatk": "GATK", "samt": "SAMtools"}
-# callers=callers_names.keys()
-
 callers=["gatk", "samtools"]
-
-# callers="|".join(vcallers.index)
 
 ##### Target rules #####
 
@@ -21,7 +12,8 @@ rule all:
         # "results/annotation/ground_truth.ann.vcf",
         expand("figures/1_read_coverage/{sample}_r_coverage.png", sample=config["sample"]),
         expand("results/3_performance/{sample}_{caller}.scores.tsv", sample=config["sample"], caller=callers),
-        expand("qc/{sample}_{caller}_multiqc.html", sample=config["sample"], caller=callers)
+        expand("results/qc/{sample}_{caller}.concord.truth.tsv", sample=config["sample"], caller=callers),
+        expand("qc/{sample}_multiqc.html", sample=config["sample"])
         # "figures/1_read_coverage/chr19_gc.png",
         # "html"
 
