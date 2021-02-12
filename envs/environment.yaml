@@ -17,3 +17,5 @@ dependencies:
   - picard =2.24.2
   - java-jdk =8.0.112
   - gatk4 =4.1.9.0
+  - vcftools =0.1.16
+  - bedops-2.4.39

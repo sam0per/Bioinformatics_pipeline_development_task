@@ -18,7 +18,7 @@ Assignment_Pipeline_Development/
 └── Files_needed_for_task
 ```
 
-The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html), a Python-based workflow management system, and after [cloning](https://help.github.com/en/articles/cloning-a-repository) this repository, the same bioinformatics steps can be performed by typing the following command line codes:
+The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/stable/index.html), a Python-based workflow management system, and after [cloning](https://help.github.com/en/articles/cloning-a-repository) this repository inside the directory `Assignment_Pipeline_Development`, the same bioinformatics steps can be performed by typing the following command line codes:
 
 1. [Install Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 

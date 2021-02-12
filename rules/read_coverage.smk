@@ -26,17 +26,18 @@ rule DeepT_coverage:
 rule intersect:
     input:
         bam="data/{sample}_RG.bam",
-        bed="../Files_needed_for_task/target_regions.bed"
+        bed=config["target"]
     output:
         inbam="results/1_read_coverage/{sample}_11.bam",
-        ofbam="results/1_read_coverage/{sample}_00.bam"
+        ofbam="results/1_read_coverage/{sample}_00.bam",
+        ofbed="results/1_read_coverage/{sample}_00.bed"
     shell:
         # awk -v OFS='\\t''$1="chr"$1' {input.bed} > ../Files_needed_for_task/target_regions_chr.bed
         """
         bedtools intersect -abam {input.bam} -b {input.bed} > {output.inbam}
         bedtools intersect -abam {input.bam} -b {input.bed} -v > {output.ofbam}
         bedtools intersect -abam {input.bam} -b {input.bed} -v -bed | \
-        cut -f 1,2,3 > {output.ofbam}.bed
+        cut -f 1,2,3 > {output.ofbed}
         samtools index {output.inbam}
         samtools index {output.ofbam}
         """
@@ -44,7 +45,7 @@ rule intersect:
 rule DeepT_target:
     input:
         inbam="results/1_read_coverage/{sample}_11.bam",
-        inbed="../Files_needed_for_task/target_regions.bed",
+        inbed=config["target"],
         ofbam="results/1_read_coverage/{sample}_00.bam"
     output:
         indat="results/1_read_coverage/deep_{sample}_11_coverage.txt",
@@ -79,7 +80,7 @@ rule plot_coverage:
 
 rule hs_metrics:
     input:
-        bed="../Files_needed_for_task/target_regions.bed",
+        bed=config["target"],
         bam="data/{sample}_RG.bam"
     output:
         ls="results/1_read_coverage/{sample}_target_regions.interval_list",

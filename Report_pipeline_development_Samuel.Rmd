@@ -12,11 +12,17 @@ In this report, I first provide a brief background about capture sequencing tech
 
 # Background
 
-Protein coding genes constitute only approximately 1% of the human genome but harbor 85% of the 
+Protein coding genes constitute only approximately 1% of the human genome but harbor 85% of the
 
 Genetic mutations in protein coding genes are very likely to disrupt important biological functions which, in the case  with large effects on human disease-related traits . Therefore, efficient strategies for selectively sequencing complete coding regions (i.e., ‘‘whole exome’’) have thepotential to contribute to the understanding of rare and common human diseases. 
 
 Whole-exome sequencing analyzes the exons or coding regions of thousands of genes simultaneously using next-generation sequencing techniques. By sequencing the exomeof apatient and comparing itwitha normal reference sequence, variations in an individual’sDNAsequence can be identified and related back to the individual’s medical concerns in an effort to discover the cause of the medical disorder.
+
+Whole genome sequencing (WGS) and Whole exome sequencing (WES) methods are applied in clinical settings for detecting patient’s genomic variants and etiology of the disease. Whole exome sequencing (WES), is becoming a standard, more economic approach to genome sequencing [1]. Although it covers only exonic regions (< 2% of the whole genome), it produces a large quantity of data (raw reads) that requires a significant amount of bioinformatics analysis to create biologically meaningful information [2]. [@kumaran2019]
+
+Next-generation sequencing (NGS) is rapidly becoming an invaluable tool in human genetics research and clinical diagnostics1,2,3. Practical use of NGS methods has dramatically increased with the development of targeted sequencing approaches, such as whole-exome sequencing (WES) or targeted sequencing of gene panels. WES emerged as an efficient alternative to whole-genome sequencing (WGS) due to both lower sequencing cost and simplification of variant analysis and data storage4. More than 80% of all variants reported in ClinVar, and more than 89% of variants reported to be pathogenic, come from the protein-coding part of the genome; this number increases to 99% when immediate CDS vicinity is included. Even allowing for the sampling bias, there is an overall agreement that most heritable diseases appear to be caused by alterations in the protein-coding regions of the genome. Given this, WES has dominated the projects characterizing human genome variation as well as clinical applications. [@barbitoff2020]
+
+Early comparative studies have focused on comparison of target intervals of various exome kits, and identified several important biases inherent to WES technology, such as coverage biases in regions with very high or low GC content9,10,11 [@barbitoff2020]
 
 # Methods
 
@@ -37,96 +43,7 @@ The breadth of coverage or the percentage of the chr19 genomic region that was c
 
 For single sample sequencing, which is the case of this assignment, an average of 30-35X coverage has been the standard minimum for generating a reliable variant call [@ajay2011; @sims2014]. Given that the overall fraction of the chr19 region was scarcely covered and that the average coverage was much lower than the current standard, the variant calling output for the given sample should be treated with caution. I expect the variant calling output to contain variants that are not present in the ground truth (false positives) as well as to lack variants that are instead present in the ground truth (false negatives). I expect, of course, to find true positives and true negatives using this pipeline but it will be less sensitive, less precise and less specific at calling variants than the pipeline used for generating the ground truth.
 
-```{bash depth, eval=FALSE, include=TRUE}
-# Estimate number of reads per high-quality bases (q20) from high-quality alignments (Q30) 
-samtools depth -a -q 20 -Q 30 -r 19:60004-14992498 ../Files_needed_for_task/chr19_dedup_sort.bam > results/1_read_coverage/chr19_depth.txt
-
-cut -f 3 results/1_read_coverage/chr19_depth.txt | sort | uniq -c > results/1_read_coverage/chr19_cov_redundancy.txt
-
-# Mean coverage
-awk '{ sum += $3 } END { if (NR > 0) print sum / NR }' results/1_read_coverage/chr19_depth.txt
-```
-
-```{r plot_coverage, message=FALSE, warning=FALSE, fig.show="hold", out.width="50%"}
-library(ggplot2)
-library(plotly)
-library(purrr)
-library(dplyr)
-library(patchwork)
-
-# Read coverage per base data (output DeepTools plotCoverage)
-deepT <- read.table("results/1_read_coverage/chr19_coverage.txt")
-deepB <- read.table("results/1_read_coverage/chr19_coverage_target.txt")
-
-# Prepare data for figures
-deepT <- merge(x = deepT, y = deepB, by = c("V1", "V2", "V3"))
-colnames(deepT) <- c("chr", "start", "end", "xxx", "intarget", "outarget")
-# Count number of bases with the same depth
-deepC <- apply(X = deepT[, -1:-3], MARGIN = 2, FUN = function(y) {
-   aggregate(x = deepT$chr, by = list(y), length)
-})
-
-# Merge list of dataframes
-ad <- deepC %>% reduce(left_join, by = "Group.1")
-colnames(ad) <- c("depth", "xxx", "intarget", "outarget") 
-# Replace NAs with 0
-ad$outarget <- ifelse(test = is.na(ad$outarget), yes = 0, no = ad$outarget)
-
-# Calculate "reverse cumulative sum"
-calc_rev <- function(dat, coln, dep_val) {
-   orow <- dat[dat[, 1] %in% dep_val, ]
-   for (i in 1:nrow(orow)) {
-      if (as.numeric(orow[i, 1])==0) {
-         orow[i, paste(coln, "perc", sep = "_")] <- (orow[i, coln]/sum(dat[, coln])) * 100
-      } else {
-         orow[i, paste(coln, "perc", sep = "_")] <- (sum(dat[dat[,1]>=as.numeric(orow[i, 1]), coln])/sum(dat[, coln]))*100
-      }
-   }
-   return(orow[, paste(coln, "perc", sep = "_")])
-}
-ad$xxx_perc <- calc_rev(dat = ad, coln = "xxx", dep_val = ad$depth)
-ad$intarget_perc <- calc_rev(dat = ad, coln = "intarget", dep_val = ad$depth)
-ad$outarget_perc <- calc_rev(dat = ad, coln = "outarget", dep_val = ad$depth)
-
-# Select values of read coverage for the figure
-brks <- c(0:10, 15, seq(20,100,length.out = 9), 125, seq(150, 350,by = 50))
-red_bin <- ad[ad$depth %in% brks, 1:4]
-
-# Calculate fraction of bases covered
-red_bin$xxx_prop <- red_bin$xxx/sum(red_bin$xxx)
-red_bin$in_prop <- red_bin$intarget/sum(red_bin$intarget)
-red_bin$out_prop <- red_bin$outarget/sum(red_bin$outarget)
-
-dtn <- data.frame(depth=rep(red_bin$depth,3),
-                  prop=c(red_bin$xxx_prop, red_bin$in_prop, red_bin$out_prop),
-                  pal=c(rep("xxx", nrow(red_bin)),
-                        rep("intarget", nrow(red_bin)),
-                        rep("outarget", nrow(red_bin))))
-# Plot fraction of bases against read coverage without the zero coverage
-ggplot(data = dtn[dtn$depth!=0, ], col = "black") +
-   geom_histogram(aes(x = as.factor(depth), y = prop, fill = pal), stat = "identity",
-                  position = "dodge") +
-   theme_bw() +
-   scale_fill_manual(values = c("#ff7f0e", "#2ca02c", "#1f77b4")) +
-   labs(x = "Coverage (# reads per bp)", y = "Fraction of bases", fill = "") +
-   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 9),
-         legend.position = "none") +
-   annotate("text", y = 0.038, x = 25, label="Overall mean = 13X", hjust=1, vjust=1, size = 6, col = "#1f77b4") +
-   annotate("text", y = 0.031, x = 25, label="Target mean = 11X", hjust=1, vjust=1, size = 6, col = "#ff7f0e") +
-   annotate("text", y = 0.024, x = 25, label="Off-target mean = 2X", hjust=1, vjust=1, size = 6,
-            col = "#2ca02c")
-
-# Plot breadth against depth of coverage
-fig <- plot_ly(ad[ad$depth<=200,], x = ~depth)
-fig <- fig %>% add_trace(y = ~xxx_perc, name = 'Overall', type = 'scatter', mode = 'lines')
-fig <- fig %>% add_trace(y = ~intarget_perc, name = 'Target', type = 'scatter', mode = 'lines')
-fig <- fig %>% add_trace(y = ~outarget_perc, name = 'Off-target', type = 'scatter', mode = 'lines')
-fig <- fig %>% layout(xaxis = list(title = "Coverage (# reads per bp)", titlefont = list(size = 18)),
-                      yaxis = list(title = "Percentage of bases >= coverage", titlefont = list(size = 18)),
-                      legend = list(font = list(size = 16)))
-fig
-```
-Figure 1. Read coverage for the overall region of chromosome 19, for the target and off-target region. Top panel: Values of the three means of coverage and fraction of bases of the found read depths, but not for all the depths. Bottom panel (interactive): Fraction of the chr19 region or breadth of coverage that was covered with a certain number of reads.
+![Figure 1. Read coverage for the selected region of chromosome 19, for the target and off-target region. Top panel: Values of the three means of coverage and fraction of bases of the found read depths, but not for all the depths. Bottom panel (interactive): Fraction of the chr19 region or breadth of coverage that was covered with a certain number of reads.](figures/1_read_coverage/chr19_r_coverage.png){ width=65% }
 
 \  
 
@@ -139,7 +56,7 @@ it was due to the fact that many of my target regions exhibited high sequence si
 
 \  
 
-![Figure. GC content.](figures/1_read_coverage/isochore.1.png){ width=35% } ![Figure. GC content.](figures/1_read_coverage/chr19_gc.png){ width=35% } 
+![Figure. Off-target GC content.](figures/1_read_coverage/GC_chr19_00.png){ width=35% } ![Figure. On-target GC content.](figures/1_read_coverage/GC_chr19_11.png){ width=35% } 
 
 \  
 

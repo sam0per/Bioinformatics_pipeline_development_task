@@ -1,4 +1,8 @@
 sample: chr19
+samplename: XXX
+truth: ../Files_needed_for_task/ground_truth.vcf.gz
+target: ../Files_needed_for_task/target_regions.bed
+caller_file: data/variant_callers.tsv
 
 dbSNP:
   # download site
@@ -11,7 +15,7 @@ dbSNP:
 ref:
   # download from site
   site: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/chromosomes/chr19.fa.gz
-  2bit: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit
+  # 2bit: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit
   # ensembl release
   release: hg19
   # region of interest
@@ -39,3 +43,8 @@ picard_config:
 modules:
   r: envs/r-envir/bin/Rscript
   bcf: envs/var_call_v1/bin/bcftools
+  snpeff: envs/var_call_v1/share/snpeff-5.0-0/snpEff.jar
+  variant_caller: gatk
+
+filters:
+  bcf: '%QUAL<20 || (AC<10 && %QUAL<15) || %MAX(AD)<=10 || %MAX(AD)/%MAX(INFO/DP)<=0.5 || %MAX(INFO/DP)>300'

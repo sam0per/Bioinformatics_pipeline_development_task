@@ -1,7 +1,7 @@
 rule gc:
     input:
         bam="data/{sample}_RG.bam",
-        ref="chrom/{sample}_hg19.2bit".format(sample=config["sample"])
+        ref="chrom/{sample}_hg19.2bit"
     output:
         fig="figures/1_read_coverage/{sample}_gc.png",
         dat="results/qc/{sample}_gc_freq.txt",
@@ -24,7 +24,7 @@ rule target_gc:
     input:
         inbam="results/1_read_coverage/{sample}_11.bam",
         ref="chrom/{sample}_hg19.2bit",
-        bed="../Files_needed_for_task/target_regions.bed"
+        bed=config["target"]
     output:
         fig="figures/1_read_coverage/GC_{sample}_11.png",
         dat="results/qc/GC_{sample}_11_freq.txt",
@@ -45,7 +45,7 @@ rule oftarget_gc:
     input:
         ofbam="results/1_read_coverage/{sample}_00.bam",
         ref="chrom/{sample}_hg19.2bit",
-        bed="results/1_read_coverage/{sample}_00.bam.bed"
+        bed="results/1_read_coverage/{sample}_00.bed"
     output:
         fig="figures/1_read_coverage/GC_{sample}_00.png",
         dat="results/qc/GC_{sample}_00_freq.txt",

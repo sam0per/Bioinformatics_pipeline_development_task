@@ -1,5 +1,5 @@
 rule mark_duplicates:
-    input: "../Files_needed_for_task/{sample}.bam".format(sample=config["sample"])
+    input: "../Files_needed_for_task/{sample}.bam"
     output:
         bam="data/{sample}_dedup.bam",
         metrics="results/qc/{sample}_dedup.metrics.txt",
@@ -25,18 +25,19 @@ rule fasta:
         bam="data/{sample}_RG.bam"
     params:
         rel=config["ref"]["release"],
-        ref=config["ref"]["site"]
+        ref=config["ref"]["site"],
+        rgsm=config["samplename"]
     shell:
         """
         # Download sequence fasta
-        # rsync -avzP {params.ref} ./data/
+        rsync -avzP {params.ref} ./data/
         gunzip -c data/{wildcards.sample}.fa.gz | sed -e 's/^>chr/>/g' > {output.fas}
         samtools faidx {output.fas}
         gatk CreateSequenceDictionary -R {output.fas}
         
         # Add read groups and build index
         picard AddOrReplaceReadGroups I={input} O={output.bam} \
-        RGLB=lib1 RGPL=ILLUMINA RGPU=unit1 RGSM=XXX VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        RGLB=lib1 RGPL=ILLUMINA RGPU=unit1 RGSM={params.rgsm} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         picard BuildBamIndex I={output.bam} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         """
 
