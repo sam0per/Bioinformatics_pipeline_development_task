@@ -30,7 +30,7 @@ For single sample sequencing, which is the case of this assignment, an average o
 
 \  
 
-![Figure 2. Read coverage for the overall, target and off-target regions of chromosome 19. Depth of covarage (y-axis) reflects the number of reads supporting each base pair of the chr19 reference sequence (x-axis). The dispersion parameters were calculated using negative binomial models.](../figures/1_read_coverage/chr19_r_coverage.png){ width=65% }
+![Figure 2. Read coverage for the overall, target and off-target regions of chromosome 19. Depth of covarage (y-axis) reflects the number of reads supporting each base pair of the chr19 reference sequence (x-axis). The dispersion parameters were calculated using negative binomial models.](figures/1_read_coverage/chr19_r_coverage.png){ width=65% }
 
 \  
 
@@ -40,7 +40,7 @@ The targeted regions showed a strong deviation in GC content and the excess was 
 
 \  
 
-![Figure 3. Off-target GC content.](../figures/1_read_coverage/GC_chr19_00.png){ width=35% } ![Figure 3. On-target GC content.](../figures/1_read_coverage/GC_chr19_11.png){ width=35% } 
+![Figure 3. Off-target GC content.](figures/1_read_coverage/GC_chr19_00.png){ width=35% } ![Figure 3. On-target GC content.](figures/1_read_coverage/GC_chr19_11.png){ width=35% } 
 
 Figure 3. Off-target (left) and on-target (right) GC content using deepTools. Top: Box-plot depicting the observed number of reads for each type of genomic region with a GC fraction between 0 to 70 percent. Bottom: log2ratio of the ratio between observed and expected number of reads with a given fraction of G’s or C’s bases. Under an ideal scenario the blue line will be flat around zero indicating no enrichments or depletions of GC content bins.
 

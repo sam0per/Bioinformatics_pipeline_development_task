@@ -36,7 +36,7 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     conda env create --prefix ./envs/var_call_v2 --file ./envs/var-call-env2.yaml
 ```
 
-4. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
+4. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish). The file `dag.svg` must be created before the proper execution of the pipeline.
 ```
     snakemake -pn                           # Dry run: execution without generating output files
     snakemake --dag | dot -Tsvg > dag.svg   # Create Figure 1 of the HTML report

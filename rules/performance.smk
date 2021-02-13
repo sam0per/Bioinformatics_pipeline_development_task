@@ -21,6 +21,7 @@ rule concordance:
         con="results/qc/{sample}_{caller}.concord.truth.tsv"
     shell:
         """
+        gatk IndexFeatureFile -I {input.tru}
         gatk Concordance -R {input.ref} -summary {output.con} -eval {input.eva} --truth {input.tru} \
         -L {input.bed}
         """
