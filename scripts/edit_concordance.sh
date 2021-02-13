@@ -15,22 +15,28 @@ truth=$2
 out=$3
 tbl=$4
 
+# pipeline: indel invariant sites
 gunzip -c $raw | grep -v "INDEL" | envs/var_call_v1/bin/bcftools \
 filter -i 'ALT="."' -Oz -o tmp/$(basename ${raw%.*}).indel.neg.gz
 tabix -p vcf tmp/$(basename ${raw%.*}).indel.neg.gz
 
+# pipeline: snp invariant sites
 vcftools --gzvcf $raw --remove-indels --recode --recode-INFO-all --stdout | envs/var_call_v1/bin/bcftools \
 filter -i 'ALT="."' -Oz -o tmp/$(basename ${raw%.*}).snp.neg.gz
 tabix -p vcf tmp/$(basename ${raw%.*}).snp.neg.gz
 
+# truth: snp variant sites
 vcftools --gzvcf $truth --remove-indels --recode --recode-INFO-all \
 --stdout | bgzip -c > tmp/$(basename ${truth%.*}).snp.gz
 tabix -p vcf tmp/$(basename ${truth%.*}).snp.gz
 
+# truth: truth variant sites
 vcftools --gzvcf $truth --keep-only-indels --recode --recode-INFO-all \
 --stdout | bgzip -c > tmp/$(basename ${truth%.*}).indel.gz
 tabix -p vcf tmp/$(basename ${truth%.*}).indel.gz
 
+# Get the number of invariant bases of the pipeline that are also invariant in the truth
+# For indel and snp separately
 for i in snp indel; do
     envs/var_call_v1/bin/bcftools isec -p ${out}_${i} -Oz tmp/$(basename ${raw%.*}).${i}.neg.gz \
     tmp/$(basename ${truth%.*}).${i}.gz
@@ -48,5 +54,5 @@ for i in snp indel; do
     den_spec=$(( tn + fp ))
     specificity=$(echo "scale=4; $tn/$den_spec" | bc)
 
-    printf "tTN\tSPECIFICITY\n${tn}\t${specificity}\n" > ${tbl%.*}.${i}.tsv
+    printf "tTN\tSpecificity\n${tn}\t${specificity}\n" > ${tbl%.*}.${i}.tsv
 done

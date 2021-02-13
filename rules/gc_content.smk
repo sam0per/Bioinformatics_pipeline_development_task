@@ -41,6 +41,36 @@ rule target_gc:
         --GCbiasFrequenciesFile {output.dat} -o {output.obam} -p max/2
         """
 
+rule GC_metrics:
+    input:
+        gcbam="results/1_read_coverage/{sample}_11.bam"
+    output:
+        mtx="results/qc/{sample}_11_GC.bias.txt",
+        summ="results/qc/{sample}_11_GC.summary.txt"
+    params:
+        ref=config["ref"]["complete"],
+        fas="data/" + config["ref"]["release"] + ".fa.gz"
+    shell:
+        """
+        rsync -avzP {params.ref} ./data/
+        gatk CreateSequenceDictionary -R {params.fas}
+
+        picard CollectGcBiasMetrics I={input.gcbam} CHART=gc_bias_metrics.pdf O={output.mtx} \
+        S={output.summ} R={output.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        """
+
+rule GCcorr_metrics:
+    input:
+        nogc="results/1_read_coverage/gc/GC_{sample}_11_corr.bam"
+    output:
+        mtx="results/qc/GC_{sample}_corr.metrics.txt",
+        summ="results/qc/GC_{sample}_corr.gcbias.txt"
+    shell:
+        """
+        picard CollectGcBiasMetrics I={input.nogc} CHART=gc_bias_metrics.pdf O={output.mtx} \
+        S={output.summ} R={output.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        """
+
 rule oftarget_gc:
     input:
         ofbam="results/1_read_coverage/{sample}_00.bam",

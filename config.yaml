@@ -15,6 +15,7 @@ dbSNP:
 ref:
   # download from site
   site: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/chromosomes/chr19.fa.gz
+  complete: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
   # 2bit: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit
   # ensembl release
   release: hg19
@@ -47,4 +48,4 @@ modules:
   variant_caller: gatk
 
 filters:
-  bcf: '%QUAL<20 || (AC<10 && %QUAL<15) || %MAX(AD)<=10 || %MAX(AD)/%MAX(INFO/DP)<=0.5 || %MAX(INFO/DP)>300'
+  bcf: '%QUAL<20 || (AC<2 && %QUAL<15) || %MAX(AD)<=10 || %MAX(AD)/%MAX(INFO/DP)<=0.5 || %MAX(INFO/DP)>300'

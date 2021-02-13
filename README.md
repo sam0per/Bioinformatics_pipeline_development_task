@@ -32,13 +32,19 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
 3. Create other environments with the required up-to-date software listed inside different YAML files. The packages of these new environments will be activated inside the pipeline to avoid conflicts with the main environment. Just run the commands below to create them but do not activate these new environments.
 ```
     conda env create --prefix ./envs/r-envir --file envs/r-environment.yaml
+
     conda env create --prefix ./envs/var_call_v1 --file ./envs/var-call-env1.yaml
+    
     conda env create --prefix ./envs/var_call_v2 --file ./envs/var-call-env2.yaml
 ```
 
 4. Execute the workflow locally printing the commands `-p` and using 1 core (change the number of cores as you wish)
 ```
-    snakemake -p --cores 1
+    snakemake -pn                           # Dry run: execution without generating output files
+
+    snakemake --dag | dot -Tsvg > dag.svg   # Create Figure 1 of the HTML report
+
+    snakemake -p --cores 1                  # Execute properly the pipeline
 ```
 
 The main output is the [MultiQC](https://multiqc.info/) HTML file `qc/chr19_multiqc.html` which contains summary statistics and interactive plots that will help understanding the HTML report `Report_pipeline_development_Samuel.nb.html`.

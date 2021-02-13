@@ -13,7 +13,8 @@ rule all:
         expand("figures/1_read_coverage/{sample}_r_coverage.png", sample=config["sample"]),
         expand("results/3_performance/{sample}_{caller}.scores.tsv", sample=config["sample"], caller=callers),
         expand("results/qc/{sample}_{caller}.concord.truth.tsv", sample=config["sample"], caller=callers),
-        expand("qc/{sample}_multiqc.html", sample=config["sample"])
+        # expand("qc/{sample}_multiqc.html", sample=config["sample"]),
+        "html"
         # "figures/1_read_coverage/chr19_gc.png",
         # "html"
 
@@ -26,4 +27,4 @@ include: "rules/gc_content.smk"
 include: "rules/calling.smk"
 include: "rules/performance.smk"
 include: "rules/qc.smk"
-# include: "rules/report.smk"
+include: "rules/report.smk"
