@@ -5,9 +5,10 @@ rule gc:
         ref=config["ref"]["complete"],
         fas="data/" + config["ref"]["release"] + ".fa.gz"
     shell:
+        # gatk CreateSequenceDictionary -R {params.fas} -O ../
         """
         rsync -avzP {params.ref} ./data/
-        gatk CreateSequenceDictionary -R {params.fas}
+        
 
         picard CollectGcBiasMetrics I={input} CHART={output}.pdf O={output} \
         S={output}.summary.txt R={params.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
