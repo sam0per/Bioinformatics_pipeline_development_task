@@ -7,7 +7,7 @@ rule multiqc:
     input:
         "results/qc/ground_truth.ann.csv",
         "results/qc/{sample}_dedup.metrics.txt",
-        "results/qc/{sample}_dedup.metrics.txt",
+        "results/qc/{sample}_samtoolsmetrics.txt",
         "results/qc/deep_coverage_{sample}.txt",
         "results/qc/deep_{sample}_11_coverage.txt",
         "results/qc/deep_{sample}_00_coverage.txt",

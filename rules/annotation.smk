@@ -5,7 +5,7 @@ rule annotate_truth:
         ann="results/annotation/ground_truth.ann.vcf",
         csv="results/qc/ground_truth.ann.csv"
     params:
-        ref=config["ref"]["release"],
+        ref=config["ref"]["version"],
         eff=config["modules"]["snpeff"]
     shell:
         """

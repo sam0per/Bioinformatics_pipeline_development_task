@@ -18,6 +18,7 @@ ref:
   complete: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
   # 2bit: rsync://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.2bit
   # ensembl release
+  version: GRCh37.87
   release: hg19
   # region of interest
   reg: 19:60677-14992498
