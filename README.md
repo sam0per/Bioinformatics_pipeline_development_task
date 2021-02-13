@@ -43,4 +43,4 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
     snakemake -p --cores 1                  # Execute properly the pipeline
 ```
 
-The main output is the [MultiQC](https://multiqc.info/){:target="_blank"} HTML file `qc/chr19_multiqc.html` which contains summary statistics and interactive plots that will help understanding the HTML report `Report_pipeline_development_Samuel.nb.html`.
+The main output is the [MultiQC](https://multiqc.info/){target="_blank"} HTML file `qc/chr19_multiqc.html` which contains summary statistics and interactive plots that will help understanding the HTML report `Report_pipeline_development_Samuel.nb.html`.
