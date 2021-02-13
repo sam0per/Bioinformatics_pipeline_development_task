@@ -61,11 +61,11 @@ rule var_metrics:
         tru=config["truth"],
         fil="results/2_variant_calling/{sample}_filt.{caller}.vcf.gz"
     output:
-        txt="results/qc/{sample}_filt.{caller}.txt"
+        txt="results/qc/{sample}_filt.{caller}.variant_calling_detail_metrics"
     params:
         tbl=lambda wildcards, output: os.path.splitext(output.txt)[0]
     shell:
         """
-        picard CollectVariantCallingMetrics --DBSNP {input.tru} -I {input.fil} -O {params.tbl} \
+        picard CollectVariantCallingMetrics DBSNP={input.tru} I={input.fil} O={params.tbl} \
         VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         """

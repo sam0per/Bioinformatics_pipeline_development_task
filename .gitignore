@@ -9,3 +9,5 @@ envs/var_call_v1/*
 envs/var_call_v2/*
 test/*
 tmp/*
+figures/1_read_coverage/chr19_r_coverage.png
+figures/1_read_coverage/GC_chr19_11.png
