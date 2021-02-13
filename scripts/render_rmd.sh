@@ -93,4 +93,4 @@ else
 fi
 
 cat $tempscript
-Rscript $tempscript
+envs/r-envir/bin/Rscript $tempscript

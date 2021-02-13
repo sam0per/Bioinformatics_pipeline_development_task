@@ -68,13 +68,13 @@ Specificity of GATK-HC and SAMtools for both types of variants was high and very
 # Format table
 coln <- c("Type", "TP", "FP", "TN", "FN", "Sensitivity", "Precision", "Specificity")
 dt <- read.table("results/3_performance/chr19_gatk.scores.tsv", header = TRUE)
-colnames(dt)[grepl(pattern = "type|RECALL|PRECISION", x = colnames(dt))] <- c("Type", "Sensitivity", "Precision")
+colnames(dt)[grepl(pattern = "type|RECALL|PRECISION|SPECIFICITY", x = colnames(dt))] <- c("Type", "Sensitivity", "Precision", "Specificity")
 levels(dt$Type)[2] <- "SNV"
 dt <- dt[, coln]
 knitr::kable(dt, caption = "Table 1. Analytical performance of GATK.")
 
 ds <- read.table("results/3_performance/chr19_samtools.scores.tsv", header = TRUE)
-colnames(ds)[grepl(pattern = "type|RECALL|PRECISION", x = colnames(ds))] <- c("Type", "Sensitivity", "Precision")
+colnames(ds)[grepl(pattern = "type|RECALL|PRECISION|SPECIFICITY", x = colnames(ds))] <- c("Type", "Sensitivity", "Precision", "Specificity")
 levels(ds$Type)[2] <- "SNV"
 ds <- ds[, coln]
 knitr::kable(ds, caption = "Analytical performance of SAMtools.")
