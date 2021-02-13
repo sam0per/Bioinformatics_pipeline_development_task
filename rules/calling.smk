@@ -37,17 +37,17 @@ rule gatk_H:
 rule gatk_G:
     input:
         ref="data/{sample}.fa",
-        bam="results/2_variant_calling/{sample}_11.g.vcf.gz",
-        bed=config["target"] + ".interval_list"
+        bam="results/2_variant_calling/{sample}_11.g.vcf.gz"
     output:
         raw="results/2_variant_calling/{sample}_11_raw.gatk.vcf.gz",
         fil="results/2_variant_calling/{sample}_filt.gatk.vcf.gz"
     params:
+        bed=config["target"] + ".interval_list",
         bcf=config["modules"]["bcf"],
         exc=config["filters"]["bcf"]
     shell:
         """
-        gatk --java-options "-Xmx8G" GenotypeGVCFs -R {input.ref} -V {input.bam} -O {output.raw} -L {input.bed} \
+        gatk --java-options "-Xmx8G" GenotypeGVCFs -R {input.ref} -V {input.bam} -O {output.raw} -L {params.bed} \
         --include-non-variant-sites true
         {params.bcf} filter -e 'ALT="."' {output.raw} | {params.bcf} filter -g3 -G10 \
         -e '{params.exc}' -Oz -o {output.fil}

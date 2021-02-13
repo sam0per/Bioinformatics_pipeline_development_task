@@ -1,6 +1,6 @@
 sample: chr19
 samplename: XXX
-truth: ../Files_needed_for_task/ground_truth.vcf.gz
+truth: ../Files_needed_for_task/ground_truth.vcf
 target: ../Files_needed_for_task/target_regions.bed
 caller_file: data/variant_callers.tsv
 
