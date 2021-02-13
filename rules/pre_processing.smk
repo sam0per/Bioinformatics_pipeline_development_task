@@ -54,7 +54,7 @@ rule stats:
     input:
         bam="data/{sample}_RG.bam",
         fas="data/{sample}.fa"
-    output: "results/qc/{sample}_samtools.metrics.txt"
+    output: "results/qc/{sample}_samtoolsmetrics.txt"
     params:
         reg=config["ref"]["reg"]
     shell:

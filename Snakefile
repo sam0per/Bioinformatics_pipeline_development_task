@@ -11,8 +11,9 @@ rule all:
         expand("results/1_read_coverage/{sample}_interval.txt", sample=config["sample"]),
         expand("results/1_read_coverage/{sample}_depth.txt", sample=config["sample"]),
         expand("figures/1_read_coverage/{sample}_r_coverage.png", sample=config["sample"]),
-        expand("results/3_performance/{sample}_{caller}.scores.tsv", sample=config["sample"], caller=callers),
+        expand("results/qc/{sample}_filt.{caller}.txt", sample=config["sample"], caller=callers),
         expand("results/qc/{sample}_{caller}.concord.truth.tsv", sample=config["sample"], caller=callers),
+        expand("results/3_performance/{sample}_{caller}.scores.tsv", sample=config["sample"], caller=callers),
         expand("qc/{sample}_multiqc.html", sample=config["sample"]),
         "html"
 

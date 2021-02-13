@@ -8,7 +8,7 @@ rule bcfstats:
         bcf=config["modules"]["bcf"]
     shell:
         """
-        {params.bcf} stats --depth 0,250,1 --fasta-ref {input.ref} {input.gatk} {input.samt} > {output}
+        {params.bcf} stats --depth 0,300,50 --fasta-ref {input.ref} {input.gatk} {input.samt} > {output}
         """
 
 rule concordance:

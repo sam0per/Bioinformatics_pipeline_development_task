@@ -12,8 +12,7 @@ rule all_depth:
 rule DeepT_coverage:
     input: "data/{sample}_RG.bam"
     output:
-        # fig="figures/1_read_coverage/{sample}_coverage",
-        dat="results/1_read_coverage/deep_coverage_{sample}.txt"
+        dat="results/qc/deep_coverage_{sample}.txt"
     params:
         reg=os.path.basename(config["ref"]["reg"]).replace("-", ":")
     shell:
@@ -49,8 +48,8 @@ rule DeepT_target:
         ofbam="results/1_read_coverage/{sample}_00.bam",
         ofbed="results/1_read_coverage/{sample}_00.bed"
     output:
-        indat="results/1_read_coverage/deep_{sample}_11_coverage.txt",
-        ofdat="results/1_read_coverage/deep_{sample}_00_coverage.txt"
+        indat="results/qc/deep_{sample}_11_coverage.txt",
+        ofdat="results/qc/deep_{sample}_00_coverage.txt"
     params:
         reg=os.path.basename(config["ref"]["reg"]).replace("-", ":")
     shell:
@@ -68,9 +67,9 @@ rule DeepT_target:
 
 rule plot_coverage:
     input:
-        who="results/1_read_coverage/deep_coverage_{sample}.txt",
-        inr="results/1_read_coverage/deep_{sample}_11_coverage.txt",
-        our="results/1_read_coverage/deep_{sample}_00_coverage.txt"
+        who="results/qc/deep_coverage_{sample}.txt",
+        inr="results/qc/deep_{sample}_11_coverage.txt",
+        our="results/qc/deep_{sample}_00_coverage.txt"
     output: "figures/1_read_coverage/{sample}_r_coverage.png"
     params:
         r=config["modules"]["r"]

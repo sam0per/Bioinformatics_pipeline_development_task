@@ -1,23 +1,16 @@
 rule gc:
-    input:
-        bam="data/{sample}_RG.bam",
-        ref="chrom/{sample}_hg19.2bit"
-    output:
-        fig="figures/1_read_coverage/{sample}_gc.png",
-        dat="results/qc/{sample}_gc_freq.txt",
-        obam="results/1_read_coverage/gc/{sample}_GC_corr.bam"
+    input: "data/{sample}_RG.bam"
+    output: "results/qc/{sample}_dedup.GC"
     params:
-        # bedtools genomecov -ibam data/chr19_RG.bam -bga | awk '{s+=$4}END{print s}' 
-        # gen=len(open("results/1_read_coverage/{sample}_depth.txt").readlines())
-        reg=os.path.basename(config["ref"]["reg"]).replace("-", ":")
+        ref=config["ref"]["complete"],
+        fas="data/" + config["ref"]["release"] + ".fa.gz"
     shell:
         """
-        computeGCBias -b {input.bam} --effectiveGenomeSize 125954048 \
-        -g {input.ref} --GCbiasFrequenciesFile {output.dat} \
-        -r {params.reg} --biasPlot {output.fig} -p max/2
+        rsync -avzP {params.ref} ./data/
+        gatk CreateSequenceDictionary -R {params.fas}
 
-        correctGCBias -b {input.bam} --effectiveGenomeSize 125954048 -g {input.ref} \
-        --GCbiasFrequenciesFile {output.dat} -o {output.obam} -p max/2
+        picard CollectGcBiasMetrics I={input} CHART={output}.pdf O={output} \
+        S={output}.summary.txt R={params.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         """
 
 rule target_gc:
@@ -48,13 +41,9 @@ rule GC_metrics:
         mtx="results/qc/{sample}_11_GC.bias.txt",
         summ="results/qc/{sample}_11_GC.summary.txt"
     params:
-        ref=config["ref"]["complete"],
         fas="data/" + config["ref"]["release"] + ".fa.gz"
     shell:
         """
-        rsync -avzP {params.ref} ./data/
-        gatk CreateSequenceDictionary -R {params.fas}
-
         picard CollectGcBiasMetrics I={input.gcbam} CHART=gc_bias_metrics.pdf O={output.mtx} \
         S={output.summ} R={params.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         """

@@ -53,3 +53,17 @@ rule gatk_G:
         -e '{params.exc}' -Oz -o {output.fil}
         tabix -p vcf {output.fil}
         """
+
+rule var_metrics:
+    input:
+        tru=config["truth"],
+        fil="results/2_variant_calling/{sample}_filt.{caller}.vcf.gz"
+    output:
+        txt="results/qc/{sample}_filt.{caller}.txt"
+    params:
+        tbl=lambda wildcards, output: os.path.splitext(output.txt)[0]
+    shell:
+        """
+        picard CollectVariantCallingMetrics --DBSNP {input.tru} -I {input.fil} -O {params.tbl} \
+        VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        """
