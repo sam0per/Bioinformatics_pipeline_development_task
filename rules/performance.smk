@@ -15,14 +15,14 @@ rule concordance:
     input:
         ref="data/{sample}.fa",
         tru=config["truth"],
-        bed=config["target"],
+        bed="results/2_variant_calling/{sample}_target.interval_list",
         eva="results/2_variant_calling/{sample}_filt.{caller}.vcf.gz"
     output:
         con="results/qc/{sample}_{caller}.concord.truth.tsv"
     shell:
         """
         gatk Concordance -R {input.ref} -summary {output.con} -eval {input.eva} --truth {input.tru} \
-        -L {input.bed}.interval_list
+        -L {input.bed}
         """
 
 rule specificty:
