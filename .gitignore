@@ -12,3 +12,4 @@ tmp/*
 figures/1_read_coverage/chr19_r_coverage.png
 figures/1_read_coverage/GC_chr19_11.png
 figures/1_read_coverage/GC_chr19_00.png
+out.log
