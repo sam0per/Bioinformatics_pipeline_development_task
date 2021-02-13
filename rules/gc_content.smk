@@ -56,7 +56,7 @@ rule GC_metrics:
         gatk CreateSequenceDictionary -R {params.fas}
 
         picard CollectGcBiasMetrics I={input.gcbam} CHART=gc_bias_metrics.pdf O={output.mtx} \
-        S={output.summ} R={output.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        S={output.summ} R={params.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         """
 
 rule GCcorr_metrics:
@@ -65,10 +65,12 @@ rule GCcorr_metrics:
     output:
         mtx="results/qc/GC_{sample}_corr.metrics.txt",
         summ="results/qc/GC_{sample}_corr.gcbias.txt"
+    params:
+        fas="data/" + config["ref"]["release"] + ".fa.gz"
     shell:
         """
         picard CollectGcBiasMetrics I={input.nogc} CHART=gc_bias_metrics.pdf O={output.mtx} \
-        S={output.summ} R={output.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
+        S={output.summ} R={params.fas} VALIDATION_STRINGENCY=LENIENT USE_JDK_DEFLATER=true USE_JDK_INFLATER=true
         """
 
 rule oftarget_gc:

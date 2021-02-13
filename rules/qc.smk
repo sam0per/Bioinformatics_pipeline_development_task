@@ -1,10 +1,17 @@
 import glob
 
 def qcstats(wildcards):
-    return glob.glob("results/qc/*")
+    return glob.glob("results/qc/wildcards.sample*")
 
 rule multiqc:
-    input: qcstats
+    input:
+        qcstats,
+        "results/qc/{sample}_11_GC.summary.txt",
+        "results/qc/GC_{sample}_corr.gcbias.txt",
+        "results/qc/GC_{sample}_00_freq.txt",
+        "results/qc/{sample}_bcfstats_callers.txt",
+        "results/qc/{sample}_samtools.metrics.txt",
+        "results/qc/{sample}_hs_metrics.txt"
         # "results/qc/{sample}_dedup.metrics.txt",
         # "results/qc/{sample}_samtools.metrics.txt",
         # "results/1_read_coverage/deep_coverage_{sample}.txt",
