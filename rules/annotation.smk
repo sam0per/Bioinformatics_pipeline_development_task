@@ -9,5 +9,5 @@ rule annotate_truth:
         eff=config["modules"]["snpeff"]
     shell:
         """
-        java -Xmx8g -jar {params.eff} -stats {output}.html -csv {output.csv} {params.ref} {input.vcf} > {output.ann}
+        java -Xmx8g -jar {params.eff} -stats {output.csv}.html -csvStats {output.csv} {params.ref} {input.vcf} > {output.ann}
         """
