@@ -34,7 +34,7 @@ rule specificty:
     output:
         stat="results/3_performance/{sample}_{caller}.scores.tsv"
     params:
-        edi="results/3_performance/{sample}_{caller}_neg/",
+        edi="results/3_performance/{sample}_{caller}_neg",
         tbl=lambda wildcards, input: os.path.splitext(input.con)[0]
         # bams=lambda wildcards, input: " ".join(input.con)
     shell:

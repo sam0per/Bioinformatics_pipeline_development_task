@@ -15,6 +15,8 @@ truth=$2
 out=$3
 tbl=$4
 
+mkdir tmp
+
 # pipeline: indel invariant sites
 gunzip -c $raw | grep -v "INDEL" | envs/var_call_v1/bin/bcftools \
 filter -i 'ALT="."' -Oz -o tmp/$(basename ${raw%.*}).indel.neg.gz
