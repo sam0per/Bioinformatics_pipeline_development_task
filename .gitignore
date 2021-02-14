@@ -2,7 +2,7 @@
 .DS_Store
 data/*
 logs/*
-qc/*
+qc/chr19_multiqc_data
 results/*
 envs/r-envir/*
 envs/var_call_v1/*
