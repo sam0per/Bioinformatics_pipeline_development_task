@@ -25,13 +25,13 @@ The pipeline was built using [Snakemake](https://snakemake.readthedocs.io/en/sta
 2. Create an environment called `pipeline_development` with the required software listed inside the YAML file and activate it
 ```
     cd Bioinformatics_pipeline_development_task
-    conda env create --name pipeline_development --file environment.yaml
+    conda env create --name pipeline_development --file ./envs/environment.yaml
     conda activate pipeline_development
 ```
 
 3. Create other environments with the required up-to-date software listed inside different YAML files. The packages of these new environments will be activated inside the pipeline to avoid conflicts with the main environment. Just run the commands below to create them but do not activate these new environments.
 ```
-    conda env create --prefix ./envs/r-envir --file envs/r-environment.yaml
+    conda env create --prefix ./envs/r-envir --file ./envs/r-environment.yaml
     conda env create --prefix ./envs/var_call_v1 --file ./envs/var-call-env1.yaml
     conda env create --prefix ./envs/var_call_v2 --file ./envs/var-call-env2.yaml
 ```
